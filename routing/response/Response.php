@@ -58,4 +58,10 @@ class Response
         die("File $file not found");
     }
 
+    public function redirect()
+    {
+        $this->add_header("Location", "/login");
+        die();
+    }
+
 }
