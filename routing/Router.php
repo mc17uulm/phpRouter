@@ -17,10 +17,12 @@ class Router
     private static $path;
     private static $type;
     private static $code404;
+    private static $response_type;
 
-    public static function init(string $prefix = "") : void
+    public static function init(string $prefix = "", string $response_type = "text") : void
     {
 
+        self::$response_type = $response_type;
         $parsed_url = parse_url($_SERVER["REQUEST_URI"]);
 
         switch($_SERVER["REQUEST_METHOD"])
@@ -104,6 +106,7 @@ class Router
                 $request = new Request($route["type"], $route["expression"]);
                 $request->add_matches($matches);
                 $response = new Response();
+                $response->set_content_type(self::$response_type);
 
                 $route_found = true;
                 call_user_func_array($route["function"], array($request, $response));
