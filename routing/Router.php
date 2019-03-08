@@ -19,7 +19,7 @@ class Router
     private static $code404;
     private static $response_type;
 
-    public static function init(string $prefix = "", string $response_type = "text") : void
+    public static function init(string $prefix = "", string $response_type = "text/html; charset=utf-8") : void
     {
 
         self::$response_type = $response_type;

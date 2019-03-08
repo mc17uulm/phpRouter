@@ -58,6 +58,11 @@ class Response
         die("File $file not found");
     }
 
+    public function set_type_to_json() : void
+    {
+        $this->set_content_type("application/json");
+    }
+
     public function redirect()
     {
         $this->add_header("Location", "/login");
