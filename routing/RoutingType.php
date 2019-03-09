@@ -16,6 +16,7 @@ abstract class RoutingType
     const HEAD = "HEAD";
     const PUT = "PUT";
     const DELETE = "DELETE";
+    const OPTIONS = "OPTIONS";
     const RESTRICTED = null;
 
 

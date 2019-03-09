@@ -37,6 +37,8 @@ class Router
                 break;
             case "DELETE": self::$type = RoutingType::DELETE;
                 break;
+            case "OPTIONS": self::$type = RoutingType::OPTIONS;
+                break;
             default: self::$type = RoutingType::RESTRICTED;
                 break;
         }
@@ -100,7 +102,7 @@ class Router
 
             $route["expression"] = "^" . $route["expression"] . "$";
 
-            if((preg_match("#".$route["expression"]."#", self::$path, $matches)) && ($route["type"] === self::$type))
+            if((preg_match("#".$route["expression"]."#", self::$path, $matches)) && (in_array(self::$type, array($route["type"], RoutingType::OPTIONS))))
             {
                 array_shift($matches);
                 if($basepath!=="")
