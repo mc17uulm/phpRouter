@@ -18,6 +18,8 @@ class Loader
 
         Router::init();
 
+        Router::add_dir("/public", __DIR__ . "/../secret");
+
         Router::get("/", function(Request $req, Response $res) {
             $res->send_success();
         });

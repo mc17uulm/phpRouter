@@ -99,7 +99,6 @@ class Router
             }
 
             $route["expression"] = "^" . $route["expression"] . "$";
-            $route["expression"] = "^" . $route["expression"] . "$";
 
             if((preg_match("#".$route["expression"]."#", self::$path, $matches)) && ($route["type"] === self::$type))
             {
@@ -116,10 +115,11 @@ class Router
 
                 if(!is_null($route["dir"]))
                 {
-                    if(is_dir($route["dir"]) && is_readable($route["dir"]) && (strpos($route["dir"], "..") === false))
+
+                    if(is_dir($route["dir"]) && is_readable($route["dir"]))
                     {
-                        $file = $route["dir"] . implode("", $matches);
-                        if(file_exists($file))
+                        $file = $route["dir"] . "/" . implode("", $matches);
+                        if(is_file($file) && file_exists($file))
                         {
                             echo file_get_contents($file);
                         }
@@ -145,6 +145,7 @@ class Router
 
         if(!$route_found)
         {
+            http_response_code(404);
             call_user_func_array(self::$code404, array(self::$path));
         }
     }
