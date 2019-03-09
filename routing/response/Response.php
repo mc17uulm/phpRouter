@@ -52,6 +52,7 @@ class Response
     {
         if(file_exists($file))
         {
+            $this->set_content_type(Response::get_mime_type($file));
             die(file_get_contents($file));
         }
 
@@ -67,6 +68,15 @@ class Response
     {
         $this->add_header("Location", "/login");
         die();
+    }
+
+    public static function get_mime_type(string $file) : string
+    {
+        $f = finfo_open();
+        $info = finfo_file($f, $file, FILEINFO_MIME_TYPE);
+        finfo_close($f);
+        return $info;
+
     }
 
 }
