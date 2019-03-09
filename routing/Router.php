@@ -121,7 +121,7 @@ class Router
                         $file = $route["dir"] . "/" . implode("", $matches);
                         if(is_file($file) && file_exists($file))
                         {
-                            header("content-type", Response::get_mime_type($file));
+                            header("Content-Type: " . Response::get_mime_type($file));
                             echo file_get_contents($file);
                         }
                         else
