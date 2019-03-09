@@ -130,7 +130,6 @@ class Response
 
         $ext = strtolower(array_pop(explode('.',$file)));
         if (array_key_exists($ext, $mime_types)) {
-            var_dump($ext);
             return $mime_types[$ext];
         }
         elseif (function_exists('finfo_open')) {
