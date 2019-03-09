@@ -7,7 +7,9 @@
             "email": "marco.combosch@uni-ulm.de"
         }
     ],
-    "require": {},
+    "require": {
+        "php": "^7.2"
+    },
     "autoload": {
         "psr-4": {
             "PHPRouting\\": "."

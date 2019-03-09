@@ -52,12 +52,13 @@ class Router
 
     }
 
-    private static function add(string $expression, string $type, callable $function) : void
+    private static function add(string $expression, string $type, callable $function, string $dir = null) : void
     {
         array_push(self::$routes, array(
-           "expression" => $expression,
-           "function" => $function,
-           "type" => $type
+            "expression" => $expression,
+            "function" => $function,
+            "type" => $type,
+            "dir" => $dir
         ));
     }
 
@@ -79,6 +80,11 @@ class Router
     public static function handle404(callable $function) : void
     {
         self::$code404 = $function;
+    }
+
+    public static function add_dir(string $expression, string $dir) : void
+    {
+        self::add($expression . "(.*)", RoutingType::GET, function() {}, $dir);
     }
 
     public static function run(string $basepath = "") : void
@@ -106,10 +112,32 @@ class Router
                 $request = new Request($route["type"], $route["expression"]);
                 $request->add_matches($matches);
                 $response = new Response();
-                $response->set_content_type(self::$response_type);
-
                 $route_found = true;
-                call_user_func_array($route["function"], array($request, $response));
+
+                if(!is_null($route["dir"]))
+                {
+                    if(is_dir($route["dir"]) && is_readable($route["dir"]) && (strpos($route["dir"], "..") === false))
+                    {
+                        $file = $route["dir"] . implode("", $matches);
+                        if(file_exists($file))
+                        {
+                            echo file_get_contents($file);
+                        }
+                        else
+                        {
+                            $route_found = false;
+                        }
+                    }
+                    else
+                    {
+                        $route_found = false;
+                    }
+                }
+                else
+                {
+                    $response->set_content_type(self::$response_type);
+                    call_user_func_array($route["function"], array($request, $response));
+                }
 
             }
 
