@@ -59,6 +59,21 @@ class Response
         die("File $file not found");
     }
 
+    public function parse_php_file(string $file, callable $pre) : void
+    {
+        if(file_exists($file))
+        {
+            $this->set_content_type(Response::get_mime_type($file));
+            ob_start();
+            $pre();
+            include $file;
+            $data = ob_get_clean();
+            die($data);
+        }
+
+        die("File $file not found");
+    }
+
     public function set_type_to_json() : void
     {
         $this->set_content_type("application/json");
