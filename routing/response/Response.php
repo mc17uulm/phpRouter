@@ -59,7 +59,7 @@ class Response
         die("File $file not found");
     }
 
-    public function parse_php_file(string $file, callable $pre) : void
+    public function parse_php_file(string $file, callable $pre = null) : void
     {
         if(file_exists($file))
         {
