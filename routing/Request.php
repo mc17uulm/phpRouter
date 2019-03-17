@@ -115,9 +115,9 @@ class Request
         return $this->files;
     }
 
-    public function is_valid_api_request() : bool
+    public function is_valid_api_request(bool $post = false) : bool
     {
-        return $this->check_http_origin() && $this->is_post_request() && $this->has_valid_csrf_token();
+        return $this->check_http_origin() && ($post ? $this->is_post_request() : true) && $this->has_valid_csrf_token();
     }
 
 
