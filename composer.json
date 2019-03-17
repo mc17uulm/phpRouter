@@ -9,7 +9,9 @@
     ],
     "require": {
         "php": "^7.2",
-        "ext-fileinfo": "*"
+        "ext-fileinfo": "*",
+        "ext-apache": "*",
+        "ext-json": "*"
     },
     "autoload": {
         "psr-4": {

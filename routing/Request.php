@@ -18,6 +18,7 @@ class Request
     private $content_type;
     private $params;
     private $matches;
+    private $headers;
     private $body;
     private $files;
 
@@ -29,6 +30,7 @@ class Request
         $this->content_type = isset($_SERVER["CONTENT_TYPE"]) ? $_SERVER["CONTENT_TYPE"] : "";
         $this->params = $this->load_params();
         $this->matches = array();
+        $this->headers = apache_request_headers();
         $this->body = $this->load_body();
         $this->files = $this->load_files();
 
@@ -93,6 +95,11 @@ class Request
         return $this->matches;
     }
 
+    public function get_headers() : array
+    {
+        return $this->headers;
+    }
+
     public function get_body() : array
     {
         return $this->body;
@@ -106,6 +113,44 @@ class Request
     public function get_files() : array
     {
         return $this->files;
+    }
+
+    public function is_valid_api_request() : bool
+    {
+        return $this->check_http_origin() && $this->is_post_request() && $this->has_valid_csrf_token();
+    }
+
+
+    public function check_http_origin() : bool
+    {
+        if(isset($_SERVER["HTTP_ORIGIN"]) && isset($_SERVER["SERVER_NAME"]))
+        {
+            return strpos(($this->check_https() ? 'https://' : 'http://') . $_SERVER["SERVER_NAME"], $_SERVER["HTTP_ORIGIN"]) === 0;
+        }
+        return false;
+    }
+
+    public function is_post_request() : bool
+    {
+        if(isset($_SERVER["REQUEST_METHOD"]))
+        {
+            return $_SERVER["REQUEST_METHOD"] === "POST";
+        }
+        return false;
+    }
+
+    public function has_valid_csrf_token() : bool
+    {
+        if(isset($this->headers["CsrfToken"]) && isset($_SESSION["csrf_token"]))
+        {
+            return $this->headers["CsrfToken"] === $_SESSION["csrf_token"];
+        }
+        return false;
+    }
+
+    private function check_https() : bool
+    {
+        return ((!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== 'off') || $_SERVER["SERVER_PORT"] == 443);
     }
 
 
