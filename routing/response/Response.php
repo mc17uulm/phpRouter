@@ -64,8 +64,8 @@ class Response
         if(file_exists($file))
         {
             $this->set_content_type(Response::get_mime_type($file));
-            ob_start();
             $pre();
+            ob_start();
             include $file;
             $data = ob_get_clean();
             die($data);
@@ -143,7 +143,8 @@ class Response
             'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
         );
 
-        $ext = strtolower(array_pop(explode('.',$file)));
+        $t = explode('.',$file);
+        $ext = strtolower(array_pop($t));
         if (array_key_exists($ext, $mime_types)) {
             return $mime_types[$ext];
         }
