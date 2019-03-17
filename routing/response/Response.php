@@ -64,7 +64,10 @@ class Response
         if(file_exists($file))
         {
             $this->set_content_type(Response::get_mime_type($file));
-            call_user_func($pre);
+            if(!is_null($pre))
+            {
+                call_user_func($pre);
+            }
             ob_start();
             include $file;
             $data = ob_get_clean();
