@@ -123,9 +123,9 @@ class Request
 
     public function check_http_origin() : bool
     {
-        if(isset($_SERVER["HTTP_ORIGIN"]) && isset($_SERVER["SERVER_NAME"]))
+        if(isset($_SERVER["HTTP_REFERER"]) && isset($_SERVER["SERVER_NAME"]))
         {
-            return strpos(($this->check_https() ? 'https://' : 'http://') . $_SERVER["SERVER_NAME"], $_SERVER["HTTP_ORIGIN"]) === 0;
+            return strpos($_SERVER["HTTP_REFERER"], ($this->check_https() ? 'https://' : 'http://') . $_SERVER["SERVER_NAME"]) === 0;
         }
         return false;
     }
