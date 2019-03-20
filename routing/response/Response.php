@@ -59,15 +59,11 @@ class Response
         die("File $file not found");
     }
 
-    public function parse_php_file(string $file, callable $pre = null) : void
+    public function parse_php_file(string $file, array $params = array()) : void
     {
         if(file_exists($file))
         {
             $this->set_content_type(Response::get_mime_type($file));
-            if(!is_null($pre))
-            {
-                call_user_func($pre);
-            }
             ob_start();
             include $file;
             $data = ob_get_clean();
