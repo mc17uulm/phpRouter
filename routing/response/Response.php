@@ -78,9 +78,9 @@ class Response
         $this->set_content_type("application/json");
     }
 
-    public function redirect()
+    public function redirect(string $location = "/") : void
     {
-        $this->add_header("Location", "/login");
+        $this->add_header("Location", $location);
         die();
     }
 
