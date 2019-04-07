@@ -57,7 +57,18 @@ class Router
 
     private static function add(string $expression, $type, callable $function, string $dir = null) : void
     {
-        $type = is_string($type) ? array($type, RoutingType::OPTIONS) : array_push($type, RoutingType::OPTIONS);
+        if(is_string($type))
+        {
+            $type = array($type, RoutingType::OPTIONS);
+        }
+        else if(is_array($type))
+        {
+            array_push($type, RoutingType::OPTIONS);
+        }
+        else
+        {
+            die();
+        }
         array_push(self::$routes, array(
             "expression" => $expression,
             "function" => $function,
