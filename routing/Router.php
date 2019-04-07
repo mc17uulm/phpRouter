@@ -8,6 +8,7 @@
 
 namespace PHPRouting\routing;
 
+use PHPRouting\routing\handler\Handler;
 use PHPRouting\routing\response\Response;
 
 class Router
@@ -54,8 +55,9 @@ class Router
 
     }
 
-    private static function add(string $expression, string $type, callable $function, string $dir = null) : void
+    private static function add(string $expression, $type, callable $function, string $dir = null) : void
     {
+        $type = is_string($type) ? array($type, RoutingType::OPTIONS) : array_push($type, RoutingType::OPTIONS);
         array_push(self::$routes, array(
             "expression" => $expression,
             "function" => $function,
@@ -89,6 +91,15 @@ class Router
         self::add($expression . "(.*)", RoutingType::GET, function() {}, $dir);
     }
 
+    public static function add_handler(string $prefix, Handler $handler) : void
+    {
+        self::add($prefix . "(.*)", array(RoutingType::GET, RoutingType::POST), function(Request $req, Response $res) use ($handler) {
+             $handler->load($req);
+             $handler->run($res);
+             die();
+        });
+    }
+
     public static function run(string $basepath = "") : void
     {
         $route_found = false;
@@ -102,7 +113,7 @@ class Router
 
             $route["expression"] = "^" . $route["expression"] . "$";
 
-            if((preg_match("#".$route["expression"]."#", self::$path, $matches)) && (in_array(self::$type, array($route["type"], RoutingType::OPTIONS))))
+            if((preg_match("#".$route["expression"]."#", self::$path, $matches)) && (in_array(self::$type, $route["type"])))
             {
                 array_shift($matches);
                 if($basepath!=="")
@@ -110,7 +121,7 @@ class Router
                     array_shift($matches);
                 }
 
-                $request = new Request($route["type"], $route["expression"]);
+                $request = new Request(self::$type, $route["expression"]);
                 $request->add_matches($matches);
                 $response = new Response();
                 $route_found = true;

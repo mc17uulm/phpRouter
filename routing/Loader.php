@@ -8,6 +8,7 @@
 
 namespace PHPRouting\routing;
 
+use PHPRouting\routing\handler\APIHandler;
 use PHPRouting\routing\response\Response;
 
 class Loader
@@ -19,6 +20,8 @@ class Loader
         Router::init();
 
         Router::add_dir("/public", __DIR__ . "/../secret");
+
+        Router::add_handler("/api", new APIHandler());
 
         Router::get("/", function(Request $req, Response $res) {
             $res->send_success();
