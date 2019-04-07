@@ -14,14 +14,7 @@ use PHPRouting\routing\response\Response;
 class APIHandler implements Handler
 {
 
-    private $req;
-
-    public function load(Request $req): void
-    {
-        $this->req = $req;
-    }
-
-    public function run(Response $res): void
+    public function run(Request $req, Response $res): void
     {
         // TODO: Implement run() method.
     }

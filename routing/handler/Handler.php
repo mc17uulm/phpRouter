@@ -14,7 +14,6 @@ use PHPRouting\routing\response\Response;
 interface Handler
 {
 
-    public function load(Request $req) : void;
-    public function run(Response $res) : void;
+    public function run(Request $req, Response $res) : void;
 
 }

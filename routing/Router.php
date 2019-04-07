@@ -105,8 +105,7 @@ class Router
     public static function add_handler(string $prefix, Handler $handler) : void
     {
         self::add($prefix . "(.*)", array(RoutingType::GET, RoutingType::POST), function(Request $req, Response $res) use ($handler) {
-             $handler->load($req);
-             $handler->run($res);
+             $handler->run($req, $res);
              die();
         });
     }
