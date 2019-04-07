@@ -59,7 +59,12 @@ class Request
         switch($this->content_type)
         {
             case "application/json":
-                return json_decode($body, true);
+                try{
+                    return json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+                } catch(\JsonException $e) {
+                    die(new Error("Invalid request"));
+                }
+
             default:
                 return array("body" => $body);
         }
