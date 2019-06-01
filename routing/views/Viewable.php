@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPRouting\views;
+namespace PHPRouting\routing\views;
 
 interface Viewable
 {

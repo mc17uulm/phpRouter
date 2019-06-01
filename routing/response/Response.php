@@ -8,7 +8,7 @@
 
 namespace PHPRouting\routing\response;
 
-use PHPRouting\views\Viewable;
+use PHPRouting\routing\views\Viewable;
 
 class Response
 {
