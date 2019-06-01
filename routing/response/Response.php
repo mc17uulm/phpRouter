@@ -8,6 +8,8 @@
 
 namespace PHPRouting\routing\response;
 
+use PHPRouting\views\Viewable;
+
 class Response
 {
 
@@ -81,6 +83,12 @@ class Response
     public function redirect(string $location = "/") : void
     {
         $this->add_header("Location", $location);
+        die();
+    }
+
+    public function render(Viewable $template) : void
+    {
+        $template->render();
         die();
     }
 
