@@ -5,6 +5,6 @@ namespace PHPRouting\views;
 interface Viewable
 {
 
-    public static function render() : void;
+    public function render() : void;
 
 }
