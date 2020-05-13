@@ -112,6 +112,20 @@ final class Response
         $this->send($response);
     }
 
+    /**
+     * @param string $html
+     */
+    public function render(string $html) : void
+    {
+        http_response_code($this->code);
+        header("Content-Type: text/html");
+        echo $html;
+        die();
+    }
+
+    /**
+     * @param string $url
+     */
     public function redirect(string $url) : void
     {
         header("Location: $url");
