@@ -1,19 +1,20 @@
 {
-    "name": "mc17uulm/php-routing",
-    "description": "PHP library for routing",
+    "name": "mc17/phprouter",
+    "description": "PHP routing library",
     "authors": [
         {
-            "name": "mc17uulm",
+            "name": "mc17",
             "email": "marco.combosch@uni-ulm.de"
         }
     ],
     "require": {
-        "php": "^7.3",
-        "ext-fileinfo": "*"
+        "php": "^7.4",
+        "myclabs/php-enum": "^1.7",
+        "ext-json": "*"
     },
     "autoload": {
         "psr-4": {
-            "PHPRouting\\": "."
+            "phpRouter\\": "src/"
         }
     }
 }

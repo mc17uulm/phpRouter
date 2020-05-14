@@ -1,11 +1,19 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mc17uulm
- * Date: 03.03.2019
- * Time: 14:41
- */
 
 require_once 'vendor/autoload.php';
 
-\PHPRouting\routing\Loader::handle();
+use phpRouter\Router;
+use phpRouter\Request;
+use phpRouter\Response;
+
+$router = new Router();
+
+$router->get("/", function(Request $req, Response $res) {
+    $res->render("<p>running</p>");
+});
+
+$router->not_found(function(Request $req, Response $res) {
+    $res->send_error("Not found");
+});
+
+$router->run();
