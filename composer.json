@@ -1,7 +1,6 @@
 {
     "name": "mc17/phprouter",
     "description": "PHP routing library",
-    "version": "2.0",
     "authors": [
         {
             "name": "mc17",
