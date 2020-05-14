@@ -1,0 +1,21 @@
+version: '3.3'
+
+services:
+
+  server:
+    container_name: server
+    build: ./
+    volumes:
+      - ./:/var/www/html
+    restart: always
+    stdin_open: true
+    ports:
+      - "80:80"
+    tty: true
+    networks:
+      main:
+        aliases:
+          - server
+
+networks:
+  main:

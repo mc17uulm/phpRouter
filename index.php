@@ -6,10 +6,10 @@ use phpRouter\Router;
 use phpRouter\Request;
 use phpRouter\Response;
 
-$router = new Router("/api");
+$router = new Router();
 
 $router->get("/", function(Request $req, Response $res) {
-    $res->send_success("running");
+    $res->render("<p>running</p>");
 });
 
 $router->not_found(function(Request $req, Response $res) {

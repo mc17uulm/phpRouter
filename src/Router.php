@@ -2,6 +2,8 @@
 
 namespace phpRouter;
 
+use Closure;
+
 /**
  * Class Router
  *
@@ -13,10 +15,25 @@ namespace phpRouter;
 final class Router
 {
 
+    /**
+     * @var array
+     */
     private array $routes;
+    /**
+     * @var string
+     */
     private string $path;
+    /**
+     * @var HTTPRequestType
+     */
     private HTTPRequestType $type;
-    private ?string $handle_not_found = null;
+    /**
+     * @var Closure|null
+     */
+    private ?Closure $handle_not_found = null;
+    /**
+     * @var string
+     */
     private string $response_type;
 
     /**
@@ -30,6 +47,7 @@ final class Router
 
         $url = parse_url($_SERVER["REQUEST_URI"]);
         $this->path = "";
+        $this->routes = [];
 
         if(isset($url["path"])) {
             $this->path = trim(substr($url["path"], strlen($prefix)));
@@ -37,6 +55,12 @@ final class Router
 
     }
 
+    /**
+     * @param string $expression
+     * @param HTTPRequestType $type
+     * @param callable $function
+     * @param string|null $dir
+     */
     private function add(string $expression, HTTPRequestType $type, callable $function, string $dir = null) : void
     {
         array_push($this->routes, array(
@@ -47,26 +71,46 @@ final class Router
         ));
     }
 
+    /**
+     * @param string $expression
+     * @param callable $function
+     */
     public function get(string $expression, callable $function) : void
     {
         $this->add($expression, HTTPRequestType::GET(), $function);
     }
 
+    /**
+     * @param string $expression
+     * @param callable $function
+     */
     public function post(string $expression, callable $function) : void
     {
         $this->add($expression, HTTPRequestType::POST(), $function);
     }
 
+    /**
+     * @param string $expression
+     * @param callable $function
+     */
     public function head(string $expression, callable $function) : void
     {
         $this->add($expression, HTTPRequestType::HEAD(), $function);
     }
 
+    /**
+     * @param callable $function
+     */
     public function not_found(callable $function) : void
     {
         $this->handle_not_found = $function;
     }
 
+    /**
+     * @param string|null $base
+     * @param bool $debug
+     * @throws RouterException
+     */
     public function run(string $base = null, bool $debug = false) : void
     {
         $route_found = false;
@@ -82,7 +126,7 @@ final class Router
             }
             $expression = "^$expression$";
 
-            if((preg_match("#$expression#", $this->path, $matches)) && (in_array($this->type, $route["type"])))
+            if((preg_match("#$expression#", $this->path, $matches)) && $this->type->equals($route["type"]))
             {
                 array_shift($matches);
                 if(!is_null($base)) array_shift($matches);
