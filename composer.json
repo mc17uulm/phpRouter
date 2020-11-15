@@ -9,12 +9,13 @@
     ],
     "require": {
         "php": "^7.4",
-        "myclabs/php-enum": "^1.7",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-apache": "*",
+        "ext-fileinfo": "*"
     },
     "autoload": {
         "psr-4": {
-            "phpRouter\\": "src/"
+            "phpRouter\\": "src/phpRouter/"
         }
     }
 }

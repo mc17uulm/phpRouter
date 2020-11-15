@@ -1,6 +1,6 @@
 # phpRouter
 
-Basic phpRouter for Apache Server
+Version 3.0
 
 ### Usage
 
@@ -16,10 +16,12 @@ use phpRouter\Router;
 use phpRouter\Request;
 use phpRouter\Response;
 
-$router = new Router("/api");
+$router = new Router();
+
+$router->serve("/files/(.*)", __DIR__ . '/../files/');
 
 $router->get("/", function(Request $req, Response $res) {
-    $res->send_success("running");
+    $res->send("Hello world");
 });
 
 $router->not_found(function(Request $req, Response $res) {

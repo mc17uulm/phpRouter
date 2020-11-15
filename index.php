@@ -9,7 +9,7 @@ use phpRouter\Response;
 $router = new Router();
 
 $router->get("/", function(Request $req, Response $res) {
-    $res->render("<p>running</p>");
+    $res->send("Hello");
 });
 
 $router->not_found(function(Request $req, Response $res) {

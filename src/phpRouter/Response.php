@@ -2,8 +2,6 @@
 
 namespace phpRouter;
 
-use Exception;
-
 /**
  * Class Response
  * @package phpRouter
@@ -31,7 +29,7 @@ final class Response
     public function __construct(bool $debug = false)
     {
         $this->headers = [];
-        $this->code = 200;
+        $this->code = 500;
         $this->content_type = "text/html";
         $this->debug = $debug;
     }
@@ -40,31 +38,28 @@ final class Response
      * @param string $key
      * @param string $value
      */
-    public function add_header(string $key, string $value) : void
-    {
+    public function add_header(string $key, string $value) : void {
         array_push($this->headers, array($key => $value));
     }
 
     /**
      * @param int $code
      */
-    public function set_http_code(int $code) : void
-    {
+    public function set_http_code(int $code) : void {
         $this->code = $code;
     }
 
     /**
      * @param string $content_type
      */
-    public function set_content_type(string $content_type) : void
-    {
+    public function set_content_type(string $content_type) : void {
         $this->content_type = $content_type;
     }
 
     /**
-     * @param array $message
+     * @param mixed $data
      */
-    public function send(array $message) : void
+    public function send($data = "") : void
     {
         if($this->debug) {
             header("Access-Control-Allow-Origin: *");
@@ -77,57 +72,69 @@ final class Response
         }
         http_response_code($this->code);
 
-        echo json_encode($message);
+        if($this->content_type === "application/json") {
+            echo json_encode($data);
+        } else {
+            echo $data;
+        }
         die();
     }
 
     /**
-     * @param string | mixed $message
+     * @param string | mixed $data
      */
-    public function send_success($message = "") : void
-    {
+    public function send_success($data = "") : void {
         $this->set_http_code(200);
         $this->set_content_type("application/json");
         $this->send([
-            "type" => "success",
-            "message" => $message
+            "status" => "success",
+            "data" => $data
         ]);
     }
 
     /**
-     * @param string | mixed $message
+     * @param string $message
      * @param string $debug_message
      */
-    public function send_error($message = "", $debug_message = "") : void
+    public function send_error(string $message, string $debug_message = "") : void
     {
-        $this->set_http_code(403);
+        $this->set_http_code(200);
         $this->set_content_type("application/json");
         $response = [
-            "type" => "error",
+            "status" => "error",
             "message" => $message
         ];
         if($this->debug) {
-            $response["debug"] = $debug_message;
+            $response["debug_message"] = $debug_message;
         }
         $this->send($response);
     }
 
     /**
-     * @param string $html
+     * @param SendableException $e
      */
-    public function render(string $html) : void
-    {
+    public function send_exception(SendableException $e) : void {
+        $this->send_error($e->getMessage(), $e->get_debug_message());
+    }
+
+    /**
+     * @param Viewable $view
+     */
+    public function render(Viewable $view) : void {
+        if($this->debug) {
+            header("Access-Control-Allow-Origin: *");
+            header("Access-Control-Allow-Methods: POST");
+        }
         http_response_code($this->code);
         header("Content-Type: text/html");
-        echo $html;
+        $view->render();
         die();
     }
 
     /**
      * @param string $url
      */
-    public function redirect(string $url) : void
-    {
+    public function redirect(string $url) : void {
         header("Location: $url");
         die();
     }
