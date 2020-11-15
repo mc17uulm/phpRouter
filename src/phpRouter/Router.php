@@ -185,6 +185,7 @@ final class Router
         $response = new Response($this->debug);
 
         foreach($this->routes as $route) {
+            assert($route instanceof Route);
             $expression = $route->get_query();
             $expression = "^$expression$";
 
@@ -192,7 +193,7 @@ final class Router
                 array_shift($matches);
                 $route_found = true;
                 $this->request->set_matches($matches);
-                call_user_func_array($route->get_func(), [$this->request, $response]);
+                call_user_func_array($route->get_function(), [$this->request, $response]);
             }
         }
 
