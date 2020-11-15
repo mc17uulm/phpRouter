@@ -68,6 +68,13 @@ final class Request
     }
 
     /**
+     * @return string
+     */
+    public function get_type() : string {
+        return $this->type;
+    }
+
+    /**
      * @return array
      */
     public function get_params() : array {

@@ -27,11 +27,16 @@ final class Router
      * @var Closure|null
      */
     private ?Closure $not_found = null;
+    /**
+     * @var bool
+     */
+    private bool $debug;
 
     /**
      * Router constructor.
+     * @param bool $debug
      */
-    public function __construct() {
+    public function __construct(bool $debug = false) {
 
         $this->routes = [];
 
@@ -46,6 +51,8 @@ final class Router
             apache_request_headers(),
             file_get_contents("php://input")
         );
+
+        $this->debug = $debug;
 
     }
 
@@ -175,7 +182,7 @@ final class Router
 
     public function run() : void {
         $route_found = false;
-        $response = new Response();
+        $response = new Response($this->debug);
 
         foreach($this->routes as $route) {
             $expression = $route->get_query();
