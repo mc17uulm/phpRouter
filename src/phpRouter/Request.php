@@ -127,12 +127,13 @@ final class Request
     }
 
     /**
+     * @param bool $assoc
      * @return array
      * @throws RouterException
      */
-    public function get_json() : array {
+    public function get_json(bool $assoc = true) : array {
         try {
-            return json_decode($this->body, true, 512, JSON_THROW_ON_ERROR);
+            return json_decode($this->body, $assoc, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             throw new RouterException("JsonException: {$e->getMessage()}");
         }
