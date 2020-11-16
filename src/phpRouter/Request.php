@@ -3,6 +3,7 @@
 namespace phpRouter;
 
 use JsonException;
+use stdClass;
 
 /**
  * Class Request
@@ -128,10 +129,10 @@ final class Request
 
     /**
      * @param bool $assoc
-     * @return array
+     * @return array|stdClass
      * @throws RouterException
      */
-    public function get_json(bool $assoc = true) : array {
+    public function get_json(bool $assoc = true) : array | stdClass {
         try {
             return json_decode($this->body, $assoc, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
