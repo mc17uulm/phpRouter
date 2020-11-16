@@ -7,9 +7,6 @@
             "email": "marco.combosch@uni-ulm.de"
         }
     ],
-    "require": {
-        "php": "^8.0"
-    },
     "autoload": {
         "psr-4": {
             "phpRouter\\": "src/phpRouter/"
