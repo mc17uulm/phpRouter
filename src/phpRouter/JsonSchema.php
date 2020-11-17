@@ -50,7 +50,7 @@ class JsonSchema {
         $validator = new SchemaValidator();
         $result = $validator->schemaValidation($payload, $this->schema);
 
-        if(!$result->isValid()) {
+        if($result->isValid()) {
             return true;
         } else {
             $error = $result->getFirstError()->keyword() . ": " . implode(",", $result->getFirstError()->keywordArgs());
