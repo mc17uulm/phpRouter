@@ -33,7 +33,7 @@ class JsonSchema {
                 $base = JSON_SCHEMA_BASE_DIR;
             }
         }
-        $file = "$base/$filename";
+        $file = "$base$filename";
         if(!file_exists($file)) throw new ValidationException("File does not exist");
         if(!is_readable($file)) throw new ValidationException("Cannot read file");
         $this->schema = Schema::fromJsonString(file_get_contents($file));
