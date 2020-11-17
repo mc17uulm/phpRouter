@@ -23,10 +23,17 @@ class JsonSchema {
 
     /**
      * Schema constructor.
-     * @param string $file
-     * @throws SendableException
+     * @param string $filename
+     * @param string $base
+     * @throws ValidationException
      */
-    public function __construct(string $file = "") {
+    public function __construct(string $filename = "", string $base = "") {
+        if($base === "") {
+            if(defined("JSON_SCHEMA_BASE_DIR")) {
+                $base = JSON_SCHEMA_BASE_DIR;
+            }
+        }
+        $file = "$base/$filename";
         if(!file_exists($file)) throw new ValidationException("File does not exist");
         if(!is_readable($file)) throw new ValidationException("Cannot read file");
         $this->schema = Schema::fromJsonString(file_get_contents($file));
@@ -36,6 +43,7 @@ class JsonSchema {
     /**
      * @param stdClass $payload
      * @param bool $throw_on_error
+     * @return bool
      * @throws ValidationException
      */
     public function validate(stdClass $payload, bool $throw_on_error = true) : bool {
