@@ -140,4 +140,26 @@ final class Request
         }
     }
 
+    /**
+     * @return int
+     * @throws RouterException
+     */
+    public function get_path_id() : int {
+        if(count($this->matches) !== 1) throw new RouterException("Count of matches for path id invalid");
+        $id = $this->matches[0];
+        if(!is_numeric($id)) throw new RouterException("Id not numeric");
+        return $id;
+    }
+
+    /**
+     * @param JsonSchema $schema
+     * @return array
+     * @throws RouterException
+     * @throws ValidationException
+     */
+    public function get_json_payload(JsonSchema $schema) : array {
+        $schema->validate($this->get_json(false));
+        return $this->get_json();
+    }
+
 }

@@ -11,5 +11,8 @@
         "psr-4": {
             "phpRouter\\": "src/phpRouter/"
         }
+    },
+    "require": {
+        "opis/json-schema": "^1.0"
     }
 }
