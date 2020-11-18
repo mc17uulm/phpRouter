@@ -180,6 +180,23 @@ final class Router
         $this->not_found = $func;
     }
 
+    /**
+     * @param array $provider
+     * @throws RouterException
+     */
+    public function use_middleware(array $provider) : void {
+        array_walk(
+            $provider,
+            function(string $class_name) {
+                if(!class_exists($class_name) || !in_array(IRouter::class, class_implements($class_name))) {
+                    throw new RouterException("given interface does not exist and/or does not implement IRouter interface");
+                }
+                assert($class_name instanceof IRouter);
+                $class_name::run($this);
+            }
+        );
+    }
+
     public function run() : void {
         $route_found = false;
         $response = new Response($this->debug);
