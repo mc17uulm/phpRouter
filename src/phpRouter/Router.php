@@ -191,7 +191,6 @@ final class Router
                 if(!class_exists($class_name) || !in_array(IRouter::class, class_implements($class_name))) {
                     throw new RouterException("given interface does not exist and/or does not implement IRouter interface");
                 }
-                assert($class_name instanceof IRouter);
                 $class_name::run($this);
             }
         );
