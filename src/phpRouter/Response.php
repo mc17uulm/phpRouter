@@ -125,7 +125,7 @@ final class Response
             header("Access-Control-Allow-Origin: *");
             header("Access-Control-Allow-Methods: POST");
         }
-        http_response_code($this->code);
+        http_response_code(200);
         header("Content-Type: text/html");
         $view->render();
         die();
