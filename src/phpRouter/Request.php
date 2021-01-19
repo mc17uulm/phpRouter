@@ -132,7 +132,7 @@ final class Request
      * @return array|stdClass
      * @throws RouterException
      */
-    public function get_json(bool $assoc = true) : array | stdClass {
+    public function get_json(bool $assoc = true) {
         try {
             return json_decode($this->body, $assoc, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {

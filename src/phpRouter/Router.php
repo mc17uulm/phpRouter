@@ -169,8 +169,18 @@ final class Router
             $res->send("File not readable");
         }
         $res->set_http_code(200);
-        $res->set_content_type(mime_content_type($filepath));
+
+        $res->set_content_type(self::get_mime_type($filepath));
         $res->send(file_get_contents($filepath));
+    }
+
+    /**
+     * @param string $file
+     * @return string
+     */
+    private static function get_mime_type(string $file) : string {
+        $extension = pathinfo($file)['extension'];
+        return MimeTypes::find_type($extension);
     }
 
     /**
