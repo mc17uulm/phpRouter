@@ -13,6 +13,9 @@
         }
     },
     "require": {
-        "opis/json-schema": "^1.0"
+        "opis/json-schema": "^1.0",
+        "ext-json": "*",
+        "ext-fileinfo": "*",
+        "ralouphie/mimey": "^1.0"
     }
 }

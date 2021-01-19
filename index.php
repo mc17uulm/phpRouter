@@ -8,6 +8,8 @@ use phpRouter\Response;
 
 $router = new Router();
 
+$router->serve("/public/(.*)", __DIR__ . "/dist/");
+
 $router->get("/", function(Request $req, Response $res) {
     $res->send("Hello");
 });
