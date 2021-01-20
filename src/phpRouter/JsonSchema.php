@@ -4,7 +4,7 @@ namespace phpRouter;
 
 use Opis\JsonSchema\Schema;
 use \Opis\JsonSchema\Validator as SchemaValidator;
-use stdClass;
+use JsonException;
 
 /**
  * Class JsonSchema
@@ -17,9 +17,13 @@ class JsonSchema {
      */
     private Schema $schema;
     /**
-     * @var bool|string
+     * @var string|null
      */
-    private string | bool $error;
+    private ?string $error;
+    /**
+     * @var array|null
+     */
+    protected ?array $result;
 
     /**
      * Schema constructor.
@@ -36,37 +40,62 @@ class JsonSchema {
         $file = "$base$filename";
         if(!file_exists($file)) throw new ValidationException("File does not exist");
         if(!is_readable($file)) throw new ValidationException("Cannot read file");
+        $content = file_get_contents($file);
+        if($content === false) {
+            throw new ValidationException("Internal Server Error", "Could not read schema file contents");
+        }
+
         $this->schema = Schema::fromJsonString(file_get_contents($file));
-        $this->error = false;
+        $this->error = null;
+        $this->result = null;
     }
 
     /**
-     * @param stdClass $payload
+     * @param Request $req
      * @param bool $throw_on_error
-     * @return bool
+     * @return $this
      * @throws ValidationException
      */
-    public function validate(stdClass $payload, bool $throw_on_error = true) : bool {
-        $validator = new SchemaValidator();
-        $result = $validator->schemaValidation($payload, $this->schema);
+    public function validate(Request $req, bool $throw_on_error = true) : self {
+        $body = $req->get_body();
+        try {
+            $payload = json_decode($body, false, 512, JSON_THROW_ON_ERROR);
 
-        if($result->isValid()) {
-            return true;
-        } else {
-            $error = $result->getFirstError()->keyword() . ": " . implode(",", $result->getFirstError()->keywordArgs());
-            if($throw_on_error) {
-                throw new ValidationException("Validation error", $error);
+            $validator = new SchemaValidator();
+            $result = $validator->schemaValidation($payload, $this->schema);
+
+            if($result->isValid()) {
+                $this->result = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+                return $this;
             }
-            $this->error = $error;
-            return false;
+
+            $this->error = $result->getFirstError()->keyword() . ":" . implode(",", $result->getFirstError()->keywordArgs());
+            if($throw_on_error) {
+                throw new ValidationException("Validation Error", $this->error);
+            }
+            return $this;
+        } catch (JsonException $e) {
+            throw new ValidationException("Invalid json", $e->getMessage());
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function cast() {return null;}
+
+    /**
+     * @return bool
+     */
+    public function has_error() : bool {
+        return !is_null($this->error);
     }
 
     /**
      * @return string
      */
     public function get_error() : string {
-        if(gettype($this->error) === "boolean") return "";
+        if(!$this->has_error()) return "";
         return $this->error;
     }
 
