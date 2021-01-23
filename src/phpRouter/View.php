@@ -11,15 +11,22 @@ use Closure;
 class View {
 
     /**
+     * @var Request
+     */
+    protected Request $req;
+
+    /**
      * @var Closure|null
      */
     protected ?Closure $children;
 
     /**
      * View constructor.
+     * @param Request $req
      * @param Closure|null $children
      */
-    public function __construct(?Closure $children = null) {
+    public function __construct(Request $req, ?Closure $children = null) {
+        $this->req = $req;
         $this->children = $children;
     }
 
