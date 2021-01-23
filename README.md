@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.0
+Version 3.0.1
 
 ### Usage
 
@@ -21,7 +21,7 @@ $router = new Router();
 $router->serve("/files/(.*)", __DIR__ . '/../files/');
 
 $router->get("/", function(Request $req, Response $res) {
-    $res->send("Hello world");
+    $res->show(new Index());
 });
 
 $router->not_found(function(Request $req, Response $res) {
