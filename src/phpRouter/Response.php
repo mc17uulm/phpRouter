@@ -29,7 +29,7 @@ final class Response
     public function __construct(bool $debug = false)
     {
         $this->headers = [];
-        $this->code = 500;
+        $this->code = 200;
         $this->content_type = "text/html";
         $this->debug = $debug;
     }
@@ -54,6 +54,20 @@ final class Response
      */
     public function set_content_type(string $content_type) : void {
         $this->content_type = $content_type;
+    }
+
+    /**
+     * @param View $view
+     */
+    public function show(View $view) : void {
+        if($this->debug) {
+            header("Access-Control-Allow-Origin: *");
+            header("Access-Control-Allow-Methods: POST");
+        }
+        http_response_code(200);
+        header("Content-Type: text/html");
+        $view->show();
+        die();
     }
 
     /**
