@@ -3,6 +3,7 @@
 namespace phpRouter;
 
 use Closure;
+use Throwable;
 
 /**
  * Class Router
@@ -27,6 +28,10 @@ final class Router
      * @var Closure|null
      */
     private ?Closure $not_found = null;
+    /**
+     * @var Closure|null
+     */
+    private ?Closure $on_error = null;
     /**
      * @var bool
      */
@@ -191,6 +196,13 @@ final class Router
     }
 
     /**
+     * @param callable $func
+     */
+    public function on_error(callable $func) : void {
+        $this->on_error = $func;
+    }
+
+    /**
      * @param array $provider
      * @throws RouterException
      */
@@ -207,25 +219,32 @@ final class Router
     }
 
     public function run() : void {
-        $route_found = false;
-        $response = new Response($this->debug);
+        try {
+            $route_found = false;
+            $response = new Response($this->debug);
 
-        foreach($this->routes as $route) {
-            assert($route instanceof Route);
-            $expression = $route->get_query();
-            $expression = "^$expression$";
+            foreach($this->routes as $route) {
+                assert($route instanceof Route);
+                $expression = $route->get_query();
+                $expression = "^$expression$";
 
-            if((preg_match("#$expression#", $this->path, $matches)) && $this->request->get_type() === $route->get_type()) {
-                array_shift($matches);
-                $route_found = true;
-                $this->request->set_matches($matches);
-                call_user_func_array($route->get_function(), [$this->request, $response]);
+                if((preg_match("#$expression#", $this->path, $matches)) && $this->request->get_type() === $route->get_type()) {
+                    array_shift($matches);
+                    $route_found = true;
+                    $this->request->set_matches($matches);
+                    call_user_func_array($route->get_function(), [$this->request, $response]);
+                }
             }
-        }
 
-        if(!$route_found) {
-            $response->set_http_code(404);
-            call_user_func_array($this->not_found, [$this->request, $response]);
+            if(!$route_found) {
+                $response->set_http_code(404);
+                call_user_func_array($this->not_found, [$this->request, $response]);
+            }
+        } catch(Throwable $e) {
+            if($this->on_error !== null) {
+                $on_error = $this->on_error;
+                $on_error($this->request, new Response($this->debug), $e->getMessage());
+            }
         }
     }
 

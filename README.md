@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.0
+Version 3.0.1
 
 ### Usage
 
@@ -26,6 +26,10 @@ $router->get("/", function(Request $req, Response $res) {
 
 $router->not_found(function(Request $req, Response $res) {
     $res->send_error("Not found");
+});
+
+$router->on_error(function(Request $req, Response $res, string $error) {
+    $res->send($error);
 });
 
 $router->run();

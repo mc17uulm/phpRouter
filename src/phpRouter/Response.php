@@ -72,11 +72,7 @@ final class Response
         }
         http_response_code($this->code);
 
-        if($this->content_type === "application/json") {
-            echo json_encode($data);
-        } else {
-            echo $data;
-        }
+        echo $data;
         die();
     }
 
@@ -86,10 +82,10 @@ final class Response
     public function send_success($data = "") : void {
         $this->set_http_code(200);
         $this->set_content_type("application/json");
-        $this->send([
+        $this->send(json_encode([
             "status" => "success",
             "data" => $data
-        ]);
+        ]));
     }
 
     /**
@@ -107,27 +103,27 @@ final class Response
         if($this->debug) {
             $response["debug_message"] = $debug_message;
         }
-        $this->send($response);
+        $this->send(json_encode($response));
     }
 
     /**
      * @param SendableException $e
      */
     public function send_exception(SendableException $e) : void {
-        $this->send_error($e->getMessage(), $e->get_debug_message());
+        $this->send_error($e->get_public_message(), $e->getMessage());
     }
 
     /**
-     * @param Viewable $view
+     * @param View $view
      */
-    public function render(Viewable $view) : void {
+    public function render(View $view) : void {
         if($this->debug) {
             header("Access-Control-Allow-Origin: *");
             header("Access-Control-Allow-Methods: POST");
         }
         http_response_code(200);
         header("Content-Type: text/html");
-        $view->render();
+        $view->show();
         die();
     }
 
