@@ -240,10 +240,15 @@ final class Router
                 $response->set_http_code(404);
                 call_user_func_array($this->not_found, [$this->request, $response]);
             }
+        } catch (SendableException $e) {
+            if($this->on_error !== null) {
+                $on_error = $this->on_error;
+                $on_error($this->request, new Response($this->debug), $e->getMessage(), $e->get_public_message());
+            }
         } catch(Throwable $e) {
             if($this->on_error !== null) {
                 $on_error = $this->on_error;
-                $on_error($this->request, new Response($this->debug), $e->getMessage());
+                $on_error($this->request, new Response($this->debug), $e->getMessage(), "");
             }
         }
     }

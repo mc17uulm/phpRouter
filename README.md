@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.0.3
+Version 3.0.4
 
 ### Usage
 
