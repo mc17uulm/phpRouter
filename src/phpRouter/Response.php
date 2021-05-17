@@ -56,12 +56,8 @@ final class Response
         $this->content_type = $content_type;
     }
 
-    /**
-     * @param array $additional_headers
-     */
-    private function send_headers(array $additional_headers = []) : void {
-        $headers = array_merge($this->headers, $additional_headers);
-        foreach($headers as $key => $value) {
+    private function send_headers() : void {
+        foreach($this->headers as $key => $value) {
             header("$key: $value");
         }
     }

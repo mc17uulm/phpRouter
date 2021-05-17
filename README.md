@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.1.1
+Version 3.1.2
 
 ### Usage
 
@@ -44,6 +44,10 @@ $router->run();
 ```
 
 ### Changelog
+
+**v3.1.2**
+
+* added ip address to request
 
 **v3.1.1**
 

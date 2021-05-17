@@ -44,6 +44,7 @@ final class Router
     /**
      * Router constructor.
      * @param bool $debug
+     * @throws RouterException
      */
     public function __construct(bool $debug = false) {
 
@@ -53,6 +54,7 @@ final class Router
         $this->path = $url["path"];
 
         $this->request = new Request(
+            $this->load_ip(),
             $this->path,
             $_SERVER["REQUEST_METHOD"],
             $this->load_parameters(),
@@ -77,6 +79,25 @@ final class Router
             }
         }
         return $parameters;
+    }
+
+    /**
+     * @return string
+     * @throws RouterException
+     */
+    private function load_ip() : string {
+        if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['HTTP_CLIENT_IP'])) {
+            $ip = $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } elseif (isset($_SERVER['REMOTE_ADDR']) && !empty($_SERVER['REMOTE_ADDR'])) {
+            $ip = $_SERVER['REMOTE_ADDR'];
+        }
+        else {
+            throw new RouterException("No ip address given");
+        }
+
+        return filter_var($ip, FILTER_VALIDATE_IP);
     }
 
     /**

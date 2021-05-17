@@ -15,6 +15,10 @@ final class Request
     /**
      * @var string
      */
+    private string $ip;
+    /**
+     * @var string
+     */
     private string $url;
     /**
      * @var string
@@ -43,6 +47,7 @@ final class Request
 
     /**
      * Request constructor.
+     * @param string $ip
      * @param string $url
      * @param string $type
      * @param array $params
@@ -50,8 +55,9 @@ final class Request
      * @param array $headers
      * @param string $body
      */
-    public function __construct(string $url, string $type, array $params, string $content_type, array $headers, string $body)
+    public function __construct(string $ip, string $url, string $type, array $params, string $content_type, array $headers, string $body)
     {
+        $this->ip = $ip;
         $this->url = $url;
         $this->type = $type;
         $this->params = $params;
@@ -59,6 +65,13 @@ final class Request
         $this->headers = $headers;
         $this->matches = [];
         $this->body = $body;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_ip() : string {
+        return $this->ip;
     }
 
     /**
