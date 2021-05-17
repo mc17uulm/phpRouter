@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.1.0
+Version 3.1.1
 
 ### Usage
 
@@ -44,6 +44,10 @@ $router->run();
 ```
 
 ### Changelog
+
+**v3.1.1**
+
+* send error returns 400 http code
 
 **v3.1.0**
 

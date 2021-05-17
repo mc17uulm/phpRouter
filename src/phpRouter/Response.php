@@ -57,17 +57,20 @@ final class Response
     }
 
     /**
+     * @param array $additional_headers
+     */
+    private function send_headers(array $additional_headers = []) : void {
+        $headers = array_merge($this->headers, $additional_headers);
+        foreach($headers as $key => $value) {
+            header("$key: $value");
+        }
+    }
+
+    /**
      * @param View $view
      */
     public function show(View $view) : void {
-        if($this->debug) {
-            header("Access-Control-Allow-Origin: *");
-            header("Access-Control-Allow-Methods: POST");
-        }
-        http_response_code(200);
-        header("Content-Type: text/html");
-        $view->show();
-        die();
+        $this->render($view);
     }
 
     /**
@@ -81,10 +84,8 @@ final class Response
         }
 
         $this->headers["Content-Type"] = $this->content_type;
-        foreach($this->headers as $key => $value) {
-            header("$key: $value");
-        }
         http_response_code($this->code);
+        $this->send_headers();
 
         echo $data;
         die();
@@ -96,10 +97,7 @@ final class Response
     public function send_success($data = "") : void {
         $this->set_http_code(200);
         $this->set_content_type("application/json");
-        $this->send(json_encode([
-            "status" => "success",
-            "data" => $data
-        ]));
+        $this->send(json_encode($data));
     }
 
     /**
@@ -108,7 +106,7 @@ final class Response
      */
     public function send_error(string $message, string $debug_message = "") : void
     {
-        $this->set_http_code(200);
+        $this->set_http_code(400);
         $this->set_content_type("application/json");
         $response = [
             "status" => "error",
@@ -129,14 +127,16 @@ final class Response
 
     /**
      * @param View $view
+     * @param int $code
      */
-    public function render(View $view) : void {
+    public function render(View $view, int $code = 200) : void {
         if($this->debug) {
             header("Access-Control-Allow-Origin: *");
             header("Access-Control-Allow-Methods: POST");
         }
-        http_response_code(200);
-        header("Content-Type: text/html");
+        http_response_code($code);
+        $this->set_content_type('text/html');
+        $this->send_headers();
         $view->show();
         die();
     }

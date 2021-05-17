@@ -20,13 +20,13 @@ final class NextFunction
      */
     private Response $response;
     /**
-     * @var array<Closure>
+     * @var array<Middleware | Closure>
      */
     private array $middlewares;
 
     /**
      * NextFunction constructor.
-     * @param array<Closure> $middlewares
+     * @param array<Middleware | Closure> $middlewares
      * @param Request $request
      * @param Response $response
      */
