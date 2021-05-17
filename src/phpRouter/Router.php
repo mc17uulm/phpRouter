@@ -13,7 +13,7 @@ final class Router
 {
 
     /**
-     * @var array
+     * @var array<Route>
      */
     private array $routes;
     /**
@@ -33,7 +33,7 @@ final class Router
      */
     private ?Closure $on_error = null;
     /**
-     * @var array<Closure>
+     * @var array<Middleware>
      */
     private array $middlewares = [];
     /**
@@ -157,16 +157,16 @@ final class Router
     }
 
     /**
-     * @param callable $next
+     * @param Middleware $next
      */
-    public function requires(callable $next) : void  {
+    public function requires(Middleware $next) : void  {
         $this->uses($next);
     }
 
     /**
-     * @param callable $next
+     * @param Middleware $next
      */
-    public function uses(callable $next) : void {
+    public function uses(Middleware $next) : void {
         array_push(
             $this->middlewares,
             $next

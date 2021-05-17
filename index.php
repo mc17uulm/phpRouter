@@ -1,27 +1,22 @@
 <?php
 
 require_once 'vendor/autoload.php';
+require_once __DIR__ . "/CheckJson.php";
 
 use phpRouter\Router;
 use phpRouter\Request;
 use phpRouter\Response;
 use phpRouter\View;
-use phpRouter\SendableException;
-use phpRouter\NextFunction;
+use phpRouter\CheckJson;
 
 $router = new Router();
 
-$router->uses(function(Request $request, Response $response, NextFunction $next) {
-    if($request->get_content_type() === "application/json") {
-        throw new SendableException("Only accept json");
-    }
-    $next();
-});
+$router->uses(new CheckJson());
 
 $router->serve("/dist/(.*)", __DIR__ . "/dist/");
 
 $router->get("/", function(Request $req, Response $res) {
-    $res->send("Hello");
+    $res->send("Hello Amigo");
 });
 
 $router->not_found(function(Request $req, Response $res) {

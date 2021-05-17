@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.0.6
+Version 3.1.0
 
 ### Usage
 
@@ -15,17 +15,11 @@ require_once 'vendor/autoload.php';
 use phpRouter\Router;
 use phpRouter\Request;
 use phpRouter\Response;
-use phpRouter\SendableException;
-use phpRouter\NextFunction;
+use phpRouter\CheckJson;
 
 $router = new Router();
 
-$router->uses(function(Request $request, Response $response, NextFunction $next) {
-    if($request->get_content_type() !== "application/json") {
-        throw new SendableException("Only accept json");
-    }
-    $next();
-});
+$router->uses(new CheckJson());
 
 $router->serve("/files/(.*)", __DIR__ . '/../files/');
 
@@ -50,6 +44,10 @@ $router->run();
 ```
 
 ### Changelog
+
+**v3.1.0**
+
+* added Middleware interface for typeable functions
 
 **v3.0.6**
 
