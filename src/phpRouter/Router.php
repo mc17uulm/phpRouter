@@ -33,6 +33,10 @@ final class Router
      */
     private ?Closure $on_error = null;
     /**
+     * @var array
+     */
+    private array $middlewares = [];
+    /**
      * @var bool
      */
     private bool $debug;
@@ -153,6 +157,16 @@ final class Router
     }
 
     /**
+     * @param callable $next
+     */
+    public function requires(callable $next) : void {
+        array_push(
+            $this->middlewares,
+            $next
+        );
+    }
+
+    /**
      * @param Request $req
      * @param Response $res
      * @param string $dir
@@ -206,7 +220,7 @@ final class Router
      * @param array $provider
      * @throws RouterException
      */
-    public function use_middleware(array $provider) : void {
+    public function use_namespace(array $provider) : void {
         array_walk(
             $provider,
             function(string $class_name) {
@@ -216,6 +230,49 @@ final class Router
                 $class_name::run($this);
             }
         );
+    }
+
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @param array $middlewares
+     */
+    private function handle_middlewares(Request $request, Response $response, array $middlewares = []) : void {
+        if(count($middlewares) > 0) {
+            $next = array_shift($middlewares);
+            $this->execute_middlewares($request, $response, $next, $middlewares);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @param callable $next
+     * @param array $middlewares
+     */
+    private function execute_middlewares(Request $request, Response $response, callable $next, array $middlewares = []) {
+        if(count($middlewares) === 0) {
+            $next($request, $response);
+        } else {
+            $func = array_shift($middlewares);
+            $wrapper = function () use($func, $request, $response, $middlewares) {
+                $func($request, $response, $middlewares);
+            };
+            $next($request, $response, $wrapper, $middlewares);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @param callable $function
+     */
+    private function execute_route(Request $request, Response $response, callable $function) : void {
+        $_middlewares = $this->middlewares;
+        array_push($_middlewares, function(Request $_request, Response $_response) use ($function) {
+            call_user_func_array($function, [$_request, $_response]);
+        });
+        $this->handle_middlewares($request, $response, $_middlewares);
     }
 
     public function run() : void {
@@ -232,13 +289,13 @@ final class Router
                     array_shift($matches);
                     $route_found = true;
                     $this->request->set_matches($matches);
-                    call_user_func_array($route->get_function(), [$this->request, $response]);
+                    $this->execute_route($this->request, $response, $route->get_function());
                 }
             }
 
             if(!$route_found) {
                 $response->set_http_code(404);
-                call_user_func_array($this->not_found, [$this->request, $response]);
+                $this->execute_route($this->request, $response, $this->not_found);
             }
         } catch (SendableException $e) {
             if($this->on_error !== null) {

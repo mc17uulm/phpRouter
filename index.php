@@ -6,10 +6,18 @@ use phpRouter\Router;
 use phpRouter\Request;
 use phpRouter\Response;
 use phpRouter\View;
+use phpRouter\SendableException;
 
 $router = new Router();
 
-$router->serve("/public/(.*)", __DIR__ . "/dist/");
+$router->requires(function(Request $request, Response $response, callable $next) {
+    if($request->get_content_type() !== "application/json") {
+        throw new SendableException("Only accept json");
+    }
+    $next();
+});
+
+$router->serve("/dist/(.*)", __DIR__ . "/dist/");
 
 $router->get("/", function(Request $req, Response $res) {
     $res->send("Hello");
