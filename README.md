@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.0.5
+Version 3.0.6
 
 ### Usage
 
@@ -16,10 +16,11 @@ use phpRouter\Router;
 use phpRouter\Request;
 use phpRouter\Response;
 use phpRouter\SendableException;
+use phpRouter\NextFunction;
 
 $router = new Router();
 
-$router->requires(function(Request $request, Response $response, callable $next) {
+$router->uses(function(Request $request, Response $response, NextFunction $next) {
     if($request->get_content_type() !== "application/json") {
         throw new SendableException("Only accept json");
     }
@@ -49,6 +50,11 @@ $router->run();
 ```
 
 ### Changelog
+
+**v3.0.6**
+
+* added NextFunction wrapper
+* renamed 'requires' middleware function to 'uses' ('requires' can still be used)
 
 **v3.0.5**
 

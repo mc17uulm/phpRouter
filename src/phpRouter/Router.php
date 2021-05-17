@@ -33,7 +33,7 @@ final class Router
      */
     private ?Closure $on_error = null;
     /**
-     * @var array
+     * @var array<Closure>
      */
     private array $middlewares = [];
     /**
@@ -159,7 +159,14 @@ final class Router
     /**
      * @param callable $next
      */
-    public function requires(callable $next) : void {
+    public function requires(callable $next) : void  {
+        $this->uses($next);
+    }
+
+    /**
+     * @param callable $next
+     */
+    public function uses(callable $next) : void {
         array_push(
             $this->middlewares,
             $next
@@ -239,26 +246,8 @@ final class Router
      */
     private function handle_middlewares(Request $request, Response $response, array $middlewares = []) : void {
         if(count($middlewares) > 0) {
-            $next = array_shift($middlewares);
-            $this->execute_middlewares($request, $response, $next, $middlewares);
-        }
-    }
-
-    /**
-     * @param Request $request
-     * @param Response $response
-     * @param callable $next
-     * @param array $middlewares
-     */
-    private function execute_middlewares(Request $request, Response $response, callable $next, array $middlewares = []) {
-        if(count($middlewares) === 0) {
-            $next($request, $response);
-        } else {
-            $func = array_shift($middlewares);
-            $wrapper = function () use($func, $request, $response, $middlewares) {
-                $func($request, $response, $middlewares);
-            };
-            $next($request, $response, $wrapper, $middlewares);
+            $next = new NextFunction($middlewares, $request, $response);
+            $next();
         }
     }
 
