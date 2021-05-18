@@ -3,7 +3,7 @@
 namespace phpRouter;
 
 use Opis\JsonSchema\Schema;
-use \Opis\JsonSchema\Validator as SchemaValidator;
+use Opis\JsonSchema\Validator as SchemaValidator;
 use JsonException;
 
 /**
@@ -70,19 +70,15 @@ class JsonSchema {
             }
 
             $this->error = $result->getFirstError()->keyword() . ":" . implode(",", $result->getFirstError()->keywordArgs());
-            if($throw_on_error) {
-                throw new ValidationException("Validation Error", $this->error);
-            }
+            if($throw_on_error) throw new ValidationException("Validation Error", $this->error);
+
             return $this;
         } catch (JsonException $e) {
             throw new ValidationException("Invalid json", $e->getMessage());
         }
     }
 
-    /**
-     * @return mixed
-     */
-    public function cast() {return null;}
+    public function cast() {}
 
     /**
      * @return bool
@@ -97,6 +93,13 @@ class JsonSchema {
     public function get_error() : string {
         if(!$this->has_error()) return "";
         return $this->error;
+    }
+
+    /**
+     * @return array
+     */
+    public function get_result() : array {
+        return $this->result;
     }
 
 }

@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.1.3
+Version 3.1.4
 
 ### Usage
 
@@ -15,11 +15,28 @@ require_once 'vendor/autoload.php';
 use phpRouter\Router;
 use phpRouter\Request;
 use phpRouter\Response;
-use phpRouter\CheckJson;
+use phpRouter\Middleware;
+use phpRouter\NextFunction;
+
+final class TestMiddleware implements Middleware {
+    public function __invoke(Request $request, Response $response, NextFunction $next): void
+    {
+        $response->set_content_type('application/json');
+        $next();
+    }
+}
+
+final class TopMiddleware implements Middleware {
+    public function __invoke(Request $request, Response $response, NextFunction $next): void
+    {
+        $response->set_http_code(203);
+        $next();
+    }
+}
 
 $router = new Router();
 
-$router->uses(new CheckJson());
+$router->uses(new TopMiddleware());
 
 $router->serve("/files/(.*)", __DIR__ . '/../files/');
 
@@ -30,6 +47,10 @@ $router->use_namespace([
 $router->get("/", function(Request $req, Response $res) {
     $res->show(new Index());
 });
+
+$router->get("/login", function(Request $req, Response $res) {
+    $res->send("ok");
+}, [new TestMiddleware()]);
 
 $router->not_found(function(Request $req, Response $res) {
     $res->send_error("Not found");
@@ -44,6 +65,11 @@ $router->run();
 ```
 
 ### Changelog
+
+**v3.1.4**
+
+* JsonSchema can now return result
+* updated example
 
 **v3.1.3**
 
