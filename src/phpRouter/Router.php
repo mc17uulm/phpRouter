@@ -25,13 +25,13 @@ final class Router
      */
     private string $path;
     /**
-     * @var Closure|null
+     * @var Route|null
      */
-    private ?Closure $not_found = null;
+    private ?Route $not_found = null;
     /**
-     * @var Closure|null
+     * @var Route|null
      */
-    private ?Closure $on_error = null;
+    private ?Route $on_error = null;
     /**
      * @var array<Middleware>
      */
@@ -103,14 +103,16 @@ final class Router
     /**
      * @param string $query
      * @param callable $func
+     * @param array<Middleware> $middlewares
      */
-    public function get(string $query, callable $func) : void {
+    public function get(string $query, callable $func, array $middlewares = []) : void {
         array_push(
             $this->routes,
             new Route(
                 "GET",
                 $query,
-                $func
+                $func,
+                $middlewares
             )
         );
     }
@@ -118,14 +120,16 @@ final class Router
     /**
      * @param string $query
      * @param callable $func
+     * @param array $middlewares
      */
-    public function post(string $query, callable $func) : void {
+    public function post(string $query, callable $func, array $middlewares = []) : void {
         array_push(
             $this->routes,
             new Route(
                 "POST",
                 $query,
-                $func
+                $func,
+                $middlewares
             )
         );
     }
@@ -133,14 +137,16 @@ final class Router
     /**
      * @param string $query
      * @param callable $func
+     * @param array $middlewares
      */
-    public function put(string $query, callable $func) : void {
+    public function put(string $query, callable $func, array $middlewares = []) : void {
         array_push(
             $this->routes,
             new Route(
                 "PUT",
                 $query,
-                $func
+                $func,
+                $middlewares
             )
         );
     }
@@ -148,14 +154,16 @@ final class Router
     /**
      * @param string $query
      * @param callable $func
+     * @param array $middlewares
      */
-    public function delete(string $query, callable $func) : void {
+    public function delete(string $query, callable $func, array $middlewares = []) : void {
         array_push(
             $this->routes,
             new Route(
                 "DELETE",
                 $query,
-                $func
+                $func,
+                $middlewares
             )
         );
     }
@@ -163,8 +171,9 @@ final class Router
     /**
      * @param string $query
      * @param string $dir
+     * @param array $middlewares
      */
-    public function serve(string $query, string $dir) : void {
+    public function serve(string $query, string $dir, array $middlewares = []) : void {
         array_push(
             $this->routes,
             new Route(
@@ -172,7 +181,8 @@ final class Router
                 $query,
                 function(Request $req, Response $res) use ($dir) {
                     Router::handle_dir_request($req, $res, $dir);
-                }
+                },
+                $middlewares
             )
         );
     }
@@ -232,16 +242,28 @@ final class Router
 
     /**
      * @param callable $func
+     * @param array<Middleware> $middlewares
      */
-    public function not_found(callable $func) : void {
-        $this->not_found = $func;
+    public function not_found(callable $func, array $middlewares = []) : void {
+        $this->not_found = new Route(
+            $this->request->get_type(),
+            $this->path,
+            $func,
+            $middlewares
+        );
     }
 
     /**
      * @param callable $func
+     * @param array<Middleware> $middlewares
      */
-    public function on_error(callable $func) : void {
-        $this->on_error = $func;
+    public function on_error(callable $func, array $middlewares = []) : void {
+        $this->on_error = new Route(
+            $this->request->get_type(),
+            $this->path,
+            $func,
+            $middlewares
+        );
     }
 
     /**
@@ -260,31 +282,6 @@ final class Router
         );
     }
 
-    /**
-     * @param Request $request
-     * @param Response $response
-     * @param array $middlewares
-     */
-    private function handle_middlewares(Request $request, Response $response, array $middlewares = []) : void {
-        if(count($middlewares) > 0) {
-            $next = new NextFunction($middlewares, $request, $response);
-            $next();
-        }
-    }
-
-    /**
-     * @param Request $request
-     * @param Response $response
-     * @param callable $function
-     */
-    private function execute_route(Request $request, Response $response, callable $function) : void {
-        $_middlewares = $this->middlewares;
-        array_push($_middlewares, function(Request $_request, Response $_response) use ($function) {
-            call_user_func_array($function, [$_request, $_response]);
-        });
-        $this->handle_middlewares($request, $response, $_middlewares);
-    }
-
     public function run() : void {
         try {
             $route_found = false;
@@ -299,23 +296,21 @@ final class Router
                     array_shift($matches);
                     $route_found = true;
                     $this->request->set_matches($matches);
-                    $this->execute_route($this->request, $response, $route->get_function());
+                    $route->execute($this->request, $response, $this->middlewares);
                 }
             }
 
             if(!$route_found) {
                 $response->set_http_code(404);
-                $this->execute_route($this->request, $response, $this->not_found);
+                $this->not_found->execute($this->request, $response, $this->middlewares);
             }
         } catch (SendableException $e) {
             if($this->on_error !== null) {
-                $on_error = $this->on_error;
-                $on_error($this->request, new Response($this->debug), $e->getMessage(), $e->get_public_message());
+                $this->on_error->error($this->request, new Response($this->debug), $e->get_public_message(), $e->getMessage());
             }
         } catch(Throwable $e) {
             if($this->on_error !== null) {
-                $on_error = $this->on_error;
-                $on_error($this->request, new Response($this->debug), $e->getMessage(), "");
+                $this->on_error->error($this->request, new Response($this->debug), "Internal server error", $e->getMessage());
             }
         }
     }

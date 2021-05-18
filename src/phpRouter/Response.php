@@ -74,15 +74,14 @@ final class Response
      */
     public function send($data = "") : void
     {
+        http_response_code($this->code);
         if($this->debug) {
             header("Access-Control-Allow-Origin: *");
             header("Access-Control-Allow-Methods: POST");
         }
 
         $this->headers["Content-Type"] = $this->content_type;
-        http_response_code($this->code);
         $this->send_headers();
-
         echo $data;
         die();
     }
@@ -91,7 +90,6 @@ final class Response
      * @param string | mixed $data
      */
     public function send_success($data = "") : void {
-        $this->set_http_code(200);
         $this->set_content_type("application/json");
         $this->send(json_encode($data));
     }
@@ -99,10 +97,11 @@ final class Response
     /**
      * @param string $message
      * @param string $debug_message
+     * @param int $code
      */
-    public function send_error(string $message, string $debug_message = "") : void
+    public function send_error(string $message, string $debug_message = "", int $code = 400) : void
     {
-        $this->set_http_code(400);
+        $this->set_http_code($code);
         $this->set_content_type("application/json");
         $response = [
             "status" => "error",

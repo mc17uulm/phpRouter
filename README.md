@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.1.2
+Version 3.1.3
 
 ### Usage
 
@@ -44,6 +44,11 @@ $router->run();
 ```
 
 ### Changelog
+
+**v3.1.3**
+
+* each route can now have their own middlewares
+* middleware handling now in Route class
 
 **v3.1.2**
 
