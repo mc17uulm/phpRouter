@@ -3,6 +3,7 @@
 namespace phpRouter;
 
 use Closure;
+use Jenssegers\Blade\Blade;
 use Throwable;
 
 /**
@@ -40,6 +41,10 @@ final class Router
      * @var bool
      */
     private bool $debug;
+    /**
+     * @var Blade|null
+     */
+    private ?Blade $blade = null;
 
     /**
      * Router constructor.
@@ -98,6 +103,14 @@ final class Router
         }
 
         return filter_var($ip, FILTER_VALIDATE_IP);
+    }
+
+    /**
+     * @param string $dir
+     * @param string $cache
+     */
+    public function set_engine(string $dir, string $cache) : void {
+        $this->blade = new Blade($dir, $cache);
     }
 
     /**
@@ -285,7 +298,7 @@ final class Router
     public function run() : void {
         try {
             $route_found = false;
-            $response = new Response($this->debug);
+            $response = new Response($this->debug, $this->blade);
 
             foreach($this->routes as $route) {
                 assert($route instanceof Route);
@@ -306,11 +319,21 @@ final class Router
             }
         } catch (SendableException $e) {
             if($this->on_error !== null) {
-                $this->on_error->error($this->request, new Response($this->debug), $e->get_public_message(), $e->getMessage());
+                $this->on_error->error(
+                    $this->request,
+                    new Response($this->debug, $this->blade),
+                    $e->get_public_message(),
+                    $e->getMessage()
+                );
             }
         } catch(Throwable $e) {
             if($this->on_error !== null) {
-                $this->on_error->error($this->request, new Response($this->debug), "Internal server error", $e->getMessage());
+                $this->on_error->error(
+                    $this->request,
+                    new Response($this->debug, $this->blade),
+                    "Internal server error",
+                    $e->getMessage()
+                );
             }
         }
     }

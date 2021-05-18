@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.1.4
+Version 3.1.5
 
 ### Usage
 
@@ -65,6 +65,10 @@ $router->run();
 ```
 
 ### Changelog
+
+**v3.1.5**
+
+* added support for blade template engine
 
 **v3.1.4**
 

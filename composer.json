@@ -16,6 +16,7 @@
         "php": ">=7.4",
         "opis/json-schema": "^1.0",
         "ext-json": "*",
-        "ext-fileinfo": "*"
+        "ext-fileinfo": "*",
+        "jenssegers/blade": "^1.4"
     }
 }

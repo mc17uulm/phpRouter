@@ -2,6 +2,8 @@
 
 namespace phpRouter;
 
+use Jenssegers\Blade\Blade;
+
 /**
  * Class Response
  * @package phpRouter
@@ -25,13 +27,23 @@ final class Response
      * @var bool
      */
     private bool $debug;
+    /**
+     * @var Blade | null
+     */
+    private ?Blade $blade;
 
-    public function __construct(bool $debug = false)
+    /**
+     * Response constructor.
+     * @param bool $debug
+     * @param Blade|null $blade
+     */
+    public function __construct(bool $debug = false, ?Blade $blade = null)
     {
         $this->headers = [];
         $this->code = 200;
         $this->content_type = "text/html";
         $this->debug = $debug;
+        $this->blade = $blade;
     }
 
     /**
@@ -133,6 +145,30 @@ final class Response
         $this->set_content_type('text/html');
         $this->send_headers();
         $view->show();
+        die();
+    }
+
+    /**
+     * @param callable $edit
+     */
+    public function setup_blade(callable $edit) : void {
+        $this->blade = $edit($this->blade);
+    }
+
+    /**
+     * @param string $name
+     * @param array $content
+     * @param int $code
+     */
+    public function blade(string $name, array $content, int $code = 200) : void {
+        http_response_code($code);
+        if($this->debug) {
+            header("Access-Control-Allow-Origin: *");
+            header("Access-Control-Allow-Methods: POST");
+        }
+        $this->set_content_type('text/html');
+        $this->send_headers();
+        echo $this->blade->render($name, $content);
         die();
     }
 
