@@ -113,6 +113,14 @@ final class Request
     }
 
     /**
+     * @param string $content_type
+     * @return bool
+     */
+    public function has_content_type(string $content_type) : bool {
+        return str_contains($this->content_type, $content_type);
+    }
+
+    /**
      * @return array
      */
     public function get_headers() : array {

@@ -13,7 +13,7 @@
         }
     },
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.0",
         "opis/json-schema": "^1.0",
         "ext-json": "*",
         "ext-fileinfo": "*",

@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.1.5
+Version 3.2
 
 ### Usage
 
@@ -65,6 +65,12 @@ $router->run();
 ```
 
 ### Changelog
+
+**v3.2**
+
+* requires now min php8.0
+* error returns now key 'debug' not 'debug_message'
+* request object can now compare content-type values
 
 **v3.1.5**
 

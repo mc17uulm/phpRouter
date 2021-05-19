@@ -120,7 +120,7 @@ final class Response
             "message" => $message
         ];
         if($this->debug) {
-            $response["debug_message"] = $debug_message;
+            $response["debug"] = $debug_message;
         }
         $this->send(json_encode($response));
     }
