@@ -78,10 +78,8 @@ final class Router
     private function load_parameters() : array
     {
         $parameters = [];
-        if(isset($_GET)) {
-            foreach($_GET as $key => $value) {
-                $parameters[$key] = $value;
-            }
+        foreach($_GET as $key => $value) {
+            $parameters[$key] = $value;
         }
         return $parameters;
     }
@@ -226,7 +224,7 @@ final class Router
         $path = $req->get_matches()[0];
         $base = realpath($dir);
         $filepath = realpath("$dir$path");
-        if(strpos($filepath, $base) !== 0) {
+        if(!str_starts_with($filepath, $base)) {
             $res->set_http_code(404);
             $res->send("Invalid path");
         }
@@ -302,10 +300,10 @@ final class Router
 
             foreach($this->routes as $route) {
                 assert($route instanceof Route);
-                $expression = $route->get_query();
-                $expression = "^$expression$";
+                $pattern = "@^" . $route->get_query() . "$@i";
 
-                if((preg_match("#$expression#", $this->path, $matches)) && $this->request->get_type() === $route->get_type()) {
+                $match = preg_match($pattern, $this->path, $matches);
+                if($match && ($this->request->get_type() === $route->get_type())) {
                     array_shift($matches);
                     $route_found = true;
                     $this->request->set_matches($matches);

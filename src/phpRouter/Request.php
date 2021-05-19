@@ -100,7 +100,7 @@ final class Request
      * @return mixed
      * @throws RouterException
      */
-    public function get_param(string $key) {
+    public function get_param(string $key): mixed {
         if(!array_key_exists($key, $this->params)) throw new RouterException("Key '$key' not set in request parameters");
         return $this->params[$key];
     }
@@ -125,6 +125,16 @@ final class Request
      */
     public function get_headers() : array {
         return $this->headers;
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     * @throws RouterException
+     */
+    public function get_match(string $key) : mixed {
+        if(!array_key_exists($key, $this->matches)) throw new RouterException("Key '$key' not set in request queries");
+        return $this->matches[$key];
     }
 
     /**
@@ -153,7 +163,8 @@ final class Request
      * @return array|stdClass
      * @throws RouterException
      */
-    public function get_json(bool $assoc = true) {
+    public function get_json(bool $assoc = true): array|stdClass
+    {
         try {
             return json_decode($this->body, $assoc, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
@@ -179,7 +190,7 @@ final class Request
      * @throws ValidationException
      */
     public function get_json_payload(JsonSchema $schema) : array {
-        $schema->validate($this->get_json(false));
+        $schema->validate($this);
         return $this->get_json();
     }
 

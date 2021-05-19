@@ -78,7 +78,7 @@ class JsonSchema {
         }
     }
 
-    public function cast() {}
+    public function cast() : mixed {}
 
     /**
      * @return bool

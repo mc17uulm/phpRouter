@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.2
+Version 3.3
 
 ### Usage
 
@@ -48,6 +48,21 @@ $router->get("/", function(Request $req, Response $res) {
     $res->show(new Index());
 });
 
+$router->get("/error", function(Request $req, Response $res) {
+    throw new Exception("internal server error");
+});
+
+$router->get("/param/(?P<token>[a-zA-Z0-9-]+)", function(Request $req, Response $res) {
+    $token = $req->get_match('token');
+    $res->send($token);
+});
+
+$router->get("/params/(?P<id>\d+)/(?P<token>[a-zA-Z0-9-]+)", function(Request $req, Response $res) {
+    $token = $req->get_match('token');
+    $id = $req->get_match('id');
+    $res->send("$token: $id");
+});
+
 $router->get("/login", function(Request $req, Response $res) {
     $res->send("ok");
 }, [new TestMiddleware()]);
@@ -65,6 +80,14 @@ $router->run();
 ```
 
 ### Changelog
+
+**v3.3**
+
+* updated docker image to php8.0
+* added phpunit and tests for basic routes
+* added WordPress REST API flavoured parameter regex
+* added new preg_match() pattern
+* added phpstan for static analyse
 
 **v3.2**
 

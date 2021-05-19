@@ -84,7 +84,7 @@ final class Response
     /**
      * @param mixed $data
      */
-    public function send($data = "") : void
+    public function send(mixed $data = "") : void
     {
         http_response_code($this->code);
         if($this->debug) {
@@ -99,9 +99,9 @@ final class Response
     }
 
     /**
-     * @param string | mixed $data
+     * @param mixed $data
      */
-    public function send_success($data = "") : void {
+    public function send_success(mixed $data = "") : void {
         $this->set_content_type("application/json");
         $this->send(json_encode($data));
     }

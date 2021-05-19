@@ -19,23 +19,27 @@ final class TestMiddleware implements Middleware {
     }
 }
 
-final class TopMiddleware implements Middleware {
-    public function __invoke(Request $request, Response $response, NextFunction $next): void
-    {
-        $response->set_http_code(203);
-        $next();
-    }
-}
-
 $router = new Router();
-
-$router->uses(new TopMiddleware());
 
 $router->serve("/dist/(.*)", __DIR__ . "/dist/");
 
-$router->get("/", function(Request $req, Response $res) use($start) {
-    $diff = round(microtime(true) - $start, 3) * 1000;
-    $res->send("Required $diff ms");
+$router->get("/", function(Request $req, Response $res) {
+    $res->send("ok");
+});
+
+$router->get("/error", function(Request $req, Response $res) {
+    throw new Exception("internal server error");
+});
+
+$router->get("/param/(?P<token>[a-zA-Z0-9-]+)", function(Request $req, Response $res) {
+    $token = $req->get_match('token');
+    $res->send($token);
+});
+
+$router->get("/params/(?P<id>\d+)/(?P<token>[a-zA-Z0-9-]+)", function(Request $req, Response $res) {
+    $token = $req->get_match('token');
+    $id = $req->get_match('id');
+    $res->send("$token: $id");
 });
 
 $router->get("/login", function(Request $req, Response $res) {
@@ -43,7 +47,7 @@ $router->get("/login", function(Request $req, Response $res) {
 }, [new TestMiddleware()]);
 
 $router->not_found(function(Request $req, Response $res) {
-    $res->send_error("Not found");
+    $res->send_error("not found", "", 404);
 });
 
 $router->on_error(function(Request $req, Response $res, string $error) {
@@ -53,7 +57,7 @@ $router->on_error(function(Request $req, Response $res, string $error) {
             <h1>Error</h1>
             <p><?= $error ?></p>
             <?php
-        }));
+        }), 400);
     }
 });
 
