@@ -23,7 +23,7 @@ final class Route {
      */
     private Closure $func;
     /**
-     * @var array<Middleware>
+     * @var array<string>
      */
     private array $middlewares;
 
@@ -32,7 +32,7 @@ final class Route {
      * @param string $type
      * @param string $query
      * @param Closure $func
-     * @param array<Middleware> $middlewares
+     * @param array<string> $middlewares
      */
     public function __construct(string $type, string $query, Closure $func, array $middlewares = [])
     {
@@ -59,13 +59,22 @@ final class Route {
     /**
      * @param Request $request
      * @param Response $response
-     * @param array $middlewares
+     * @param array<string> $middlewares
+     * @throws RouterException
      */
     public function execute(Request $request, Response $response, array $middlewares = []) : void {
         $_function = $this->func;
-        $_middlewares = array_merge($middlewares, $this->middlewares);
+        $_middlewares = array_map(
+            function(string $class_name) : Middleware {
+                if(!class_exists($class_name) || !in_array(Middleware::class, class_implements($class_name))) {
+                    throw new RouterException('given middleware does not implement Middleware interface');
+                }
+                return new $class_name();
+            },
+            array_merge($middlewares, $this->middlewares)
+        );
         array_push($_middlewares, function(Request $_request, Response $_response) use ($_function) {
-           call_user_func_array($_function, [$_request, $_response]);
+            call_user_func_array($_function, [$_request, $_response]);
         });
         $next = new NextFunction($_middlewares, $request, $response);
         $next();

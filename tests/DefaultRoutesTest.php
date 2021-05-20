@@ -88,4 +88,27 @@ final class DefaultRoutesTest extends TestCase
         $this->assertEquals('teststring: 123', $response->getBody()->getContents());
     }
 
+    /**
+     * @test
+     * @throws GuzzleException
+     */
+    public function localMiddlewareIsWorking() : void {
+        $client = self::get_client();
+        $response = $client->request('GET', 'login');
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('ok', $response->getBody()->getContents());
+        $this->assertEquals('application/json', $response->getHeader('Content-Type')[0]);
+    }
+
+    /**
+     * @test
+     * @throws GuzzleException
+     */
+    public function globalMiddlewareIsWorking() : void {
+        $client = self::get_client();
+        $response = $client->request('GET', '/');
+        $this->assertEquals('true', $response->getHeader('X-Modified-Header')[0]);
+    }
+
 }

@@ -2,7 +2,6 @@
 
 namespace phpRouter;
 
-use Closure;
 use Jenssegers\Blade\Blade;
 use Throwable;
 
@@ -34,7 +33,7 @@ final class Router
      */
     private ?Route $on_error = null;
     /**
-     * @var array<Middleware>
+     * @var array<string>
      */
     private array $middlewares = [];
     /**
@@ -114,7 +113,7 @@ final class Router
     /**
      * @param string $query
      * @param callable $func
-     * @param array<Middleware> $middlewares
+     * @param array<string> $middlewares
      */
     public function get(string $query, callable $func, array $middlewares = []) : void {
         array_push(
@@ -131,7 +130,7 @@ final class Router
     /**
      * @param string $query
      * @param callable $func
-     * @param array $middlewares
+     * @param array<string> $middlewares
      */
     public function post(string $query, callable $func, array $middlewares = []) : void {
         array_push(
@@ -148,7 +147,7 @@ final class Router
     /**
      * @param string $query
      * @param callable $func
-     * @param array $middlewares
+     * @param array<string> $middlewares
      */
     public function put(string $query, callable $func, array $middlewares = []) : void {
         array_push(
@@ -165,7 +164,7 @@ final class Router
     /**
      * @param string $query
      * @param callable $func
-     * @param array $middlewares
+     * @param array<string> $middlewares
      */
     public function delete(string $query, callable $func, array $middlewares = []) : void {
         array_push(
@@ -182,7 +181,7 @@ final class Router
     /**
      * @param string $query
      * @param string $dir
-     * @param array $middlewares
+     * @param array<string> $middlewares
      */
     public function serve(string $query, string $dir, array $middlewares = []) : void {
         array_push(
@@ -199,16 +198,16 @@ final class Router
     }
 
     /**
-     * @param Middleware $next
+     * @param string $next
      */
-    public function requires(Middleware $next) : void  {
+    public function requires(string $next) : void  {
         $this->uses($next);
     }
 
     /**
-     * @param Middleware $next
+     * @param string $next
      */
-    public function uses(Middleware $next) : void {
+    public function uses(string $next) : void {
         array_push(
             $this->middlewares,
             $next
@@ -253,7 +252,7 @@ final class Router
 
     /**
      * @param callable $func
-     * @param array<Middleware> $middlewares
+     * @param array<string> $middlewares
      */
     public function not_found(callable $func, array $middlewares = []) : void {
         $this->not_found = new Route(
@@ -266,7 +265,7 @@ final class Router
 
     /**
      * @param callable $func
-     * @param array<Middleware> $middlewares
+     * @param array<string> $middlewares
      */
     public function on_error(callable $func, array $middlewares = []) : void {
         $this->on_error = new Route(

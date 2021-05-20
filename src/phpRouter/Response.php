@@ -51,7 +51,7 @@ final class Response
      * @param string $value
      */
     public function add_header(string $key, string $value) : void {
-        array_push($this->headers, array($key => $value));
+        $this->headers += array($key => $value);
     }
 
     /**
@@ -88,11 +88,11 @@ final class Response
     {
         http_response_code($this->code);
         if($this->debug) {
-            header("Access-Control-Allow-Origin: *");
-            header("Access-Control-Allow-Methods: POST");
+            $this->add_header('Access-Control-Allow-Origin', '*');
+            $this->add_header('Access-Control-Allow-Methods', 'POST');
         }
 
-        $this->headers["Content-Type"] = $this->content_type;
+        $this->add_header('Content-Type', $this->content_type);
         $this->send_headers();
         echo $data;
         die();

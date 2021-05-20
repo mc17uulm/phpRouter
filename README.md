@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.3
+Version 3.3.1
 
 ### Usage
 
@@ -18,6 +18,14 @@ use phpRouter\Response;
 use phpRouter\Middleware;
 use phpRouter\NextFunction;
 
+final class GlobalMiddleware implements Middleware {
+    public function __invoke(Request $request, Response $response, NextFunction $next): void
+    {
+        $response->add_header('X-Modified-Header', 'true');
+        $next();
+    }
+}
+
 final class TestMiddleware implements Middleware {
     public function __invoke(Request $request, Response $response, NextFunction $next): void
     {
@@ -26,17 +34,9 @@ final class TestMiddleware implements Middleware {
     }
 }
 
-final class TopMiddleware implements Middleware {
-    public function __invoke(Request $request, Response $response, NextFunction $next): void
-    {
-        $response->set_http_code(203);
-        $next();
-    }
-}
-
 $router = new Router();
 
-$router->uses(new TopMiddleware());
+$router->uses(GlobalMiddleware::class);
 
 $router->serve("/files/(.*)", __DIR__ . '/../files/');
 
@@ -65,7 +65,7 @@ $router->get("/params/(?P<id>\d+)/(?P<token>[a-zA-Z0-9-]+)", function(Request $r
 
 $router->get("/login", function(Request $req, Response $res) {
     $res->send("ok");
-}, [new TestMiddleware()]);
+}, [TestMiddleware::class]);
 
 $router->not_found(function(Request $req, Response $res) {
     $res->send_error("Not found");
@@ -80,6 +80,12 @@ $router->run();
 ```
 
 ### Changelog
+
+**v3.3.1**
+
+* added more tests
+* middleware is now added as class string not as an object
+* fixed bug in header allocation
 
 **v3.3**
 

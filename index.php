@@ -11,6 +11,14 @@ use phpRouter\NextFunction;
 
 $start = microtime(true);
 
+final class GlobalMiddleware implements Middleware {
+    public function __invoke(Request $request, Response $response, NextFunction $next): void
+    {
+        $response->add_header('X-Modified-Header', 'true');
+        $next();
+    }
+}
+
 final class TestMiddleware implements Middleware {
     public function __invoke(Request $request, Response $response, NextFunction $next): void
     {
@@ -20,6 +28,8 @@ final class TestMiddleware implements Middleware {
 }
 
 $router = new Router();
+
+$router->uses(GlobalMiddleware::class);
 
 $router->serve("/dist/(.*)", __DIR__ . "/dist/");
 
@@ -44,7 +54,7 @@ $router->get("/params/(?P<id>\d+)/(?P<token>[a-zA-Z0-9-]+)", function(Request $r
 
 $router->get("/login", function(Request $req, Response $res) {
     $res->send("ok");
-}, [new TestMiddleware()]);
+}, [TestMiddleware::class]);
 
 $router->not_found(function(Request $req, Response $res) {
     $res->send_error("not found", "", 404);
