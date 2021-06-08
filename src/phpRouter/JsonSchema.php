@@ -51,13 +51,13 @@ class JsonSchema {
     }
 
     /**
-     * @param Request $req
+     * @param Request|string $request
      * @param bool $throw_on_error
      * @return $this
      * @throws ValidationException
      */
-    public function validate(Request $req, bool $throw_on_error = true) : self {
-        $body = $req->get_body();
+    public function validate(Request | string $request, bool $throw_on_error = true) : self {
+        $body = ($request instanceof Request) ? $request->get_body() : $request;
         try {
             $payload = json_decode($body, false, 512, JSON_THROW_ON_ERROR);
 

@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.3.1
+Version 3.3.2
 
 ### Usage
 
@@ -80,6 +80,10 @@ $router->run();
 ```
 
 ### Changelog
+
+**v3.3.2**
+
+* JsonSchema::validate() first argument can now be Request or string
 
 **v3.3.1**
 
