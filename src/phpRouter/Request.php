@@ -97,11 +97,15 @@ final class Request
 
     /**
      * @param string $key
+     * @param mixed $default
      * @return mixed
      * @throws RouterException
      */
-    public function get_param(string $key): mixed {
-        if(!array_key_exists($key, $this->params)) throw new RouterException("Key '$key' not set in request parameters");
+    public function get_param(string $key, mixed $default = null): mixed {
+        if(!array_key_exists($key, $this->params)) {
+            if($default === null) throw new RouterException("Key '$key' not set in request parameters");
+            return $default;
+        }
         return $this->params[$key];
     }
 
