@@ -111,4 +111,14 @@ final class DefaultRoutesTest extends TestCase
         $this->assertEquals('true', $response->getHeader('X-Modified-Header')[0]);
     }
 
+    /**
+     * @throws GuzzleException
+     */
+    public function arrayCallableIsWorking() : void {
+        $client = self::get_client();
+        $response = $client->request('GET', 'callable_router');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('ok callable', $response->getBody()->getContents());
+    }
+
 }

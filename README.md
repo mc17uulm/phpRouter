@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.3.2
+Version 3.3.3
 
 ### Usage
 
@@ -48,6 +48,14 @@ $router->get("/", function(Request $req, Response $res) {
     $res->show(new Index());
 });
 
+final class Test {
+    public static function handle(Request $req, Response $res) {
+        $res->show(new Index());
+    }
+}
+
+$router->get('/test', [Test::class, 'handle']);
+
 $router->get("/error", function(Request $req, Response $res) {
     throw new Exception("internal server error");
 });
@@ -80,6 +88,10 @@ $router->run();
 ```
 
 ### Changelog
+
+**v3.3.3**
+
+* execute callbacks via ``[ClassName::class, 'function']``
 
 **v3.3.2**
 

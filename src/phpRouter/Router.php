@@ -315,23 +315,19 @@ final class Router
                 $this->not_found->execute($this->request, $response, $this->middlewares);
             }
         } catch (SendableException $e) {
-            if($this->on_error !== null) {
-                $this->on_error->error(
-                    $this->request,
-                    new Response($this->debug, $this->blade),
-                    $e->get_public_message(),
-                    $e->getMessage()
-                );
-            }
+            $this->on_error?->error(
+                $this->request,
+                new Response($this->debug, $this->blade),
+                $e->get_public_message(),
+                $e->getMessage()
+            );
         } catch(Throwable $e) {
-            if($this->on_error !== null) {
-                $this->on_error->error(
-                    $this->request,
-                    new Response($this->debug, $this->blade),
-                    "Internal server error",
-                    $e->getMessage()
-                );
-            }
+            $this->on_error?->error(
+                $this->request,
+                new Response($this->debug, $this->blade),
+                "Internal server error",
+                $e->getMessage()
+            );
         }
     }
 
