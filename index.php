@@ -37,6 +37,14 @@ $router->get("/", function(Request $req, Response $res) {
     $res->send("ok");
 });
 
+final class Test {
+    public static function handle(Request $req, Response $res) {
+        $res->send('ok callable');
+    }
+}
+
+$router->get('/callable_router', [Test::class, 'handle']);
+
 $router->get("/error", function(Request $req, Response $res) {
     throw new Exception("internal server error");
 });

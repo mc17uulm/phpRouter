@@ -2,8 +2,6 @@
 
 namespace phpRouter;
 
-use Closure;
-
 /**
  * Class Route
  * @package phpRouter
@@ -19,9 +17,9 @@ final class Route {
      */
     private string $query;
     /**
-     * @var Closure
+     * @var callable
      */
-    private Closure $func;
+    private $func;
     /**
      * @var array<string>
      */
@@ -31,10 +29,10 @@ final class Route {
      * Route constructor.
      * @param string $type
      * @param string $query
-     * @param Closure $func
+     * @param callable $func
      * @param array<string> $middlewares
      */
-    public function __construct(string $type, string $query, Closure $func, array $middlewares = [])
+    public function __construct(string $type, string $query, callable $func, array $middlewares = [])
     {
         $this->type = $type;
         $this->query = $query;
