@@ -113,7 +113,7 @@ final class Router
     /**
      * @param string $query
      * @param callable $func
-     * @param array<string> $middlewares
+     * @param array<string|Middleware> $middlewares
      */
     public function get(string $query, callable $func, array $middlewares = []) : void {
         array_push(
@@ -130,7 +130,7 @@ final class Router
     /**
      * @param string $query
      * @param callable $func
-     * @param array<string> $middlewares
+     * @param array<string|Middleware> $middlewares
      */
     public function post(string $query, callable $func, array $middlewares = []) : void {
         array_push(
@@ -147,7 +147,7 @@ final class Router
     /**
      * @param string $query
      * @param callable $func
-     * @param array<string> $middlewares
+     * @param array<string|Middleware> $middlewares
      */
     public function put(string $query, callable $func, array $middlewares = []) : void {
         array_push(
@@ -164,7 +164,7 @@ final class Router
     /**
      * @param string $query
      * @param callable $func
-     * @param array<string> $middlewares
+     * @param array<string|Middleware> $middlewares
      */
     public function delete(string $query, callable $func, array $middlewares = []) : void {
         array_push(
@@ -181,7 +181,7 @@ final class Router
     /**
      * @param string $query
      * @param string $dir
-     * @param array<string> $middlewares
+     * @param array<string|Middleware> $middlewares
      */
     public function serve(string $query, string $dir, array $middlewares = []) : void {
         array_push(
@@ -252,7 +252,7 @@ final class Router
 
     /**
      * @param callable $func
-     * @param array<string> $middlewares
+     * @param array<string|Middleware> $middlewares
      */
     public function not_found(callable $func, array $middlewares = []) : void {
         $this->not_found = new Route(
@@ -265,7 +265,7 @@ final class Router
 
     /**
      * @param callable $func
-     * @param array<string> $middlewares
+     * @param array<string|Middleware> $middlewares
      */
     public function on_error(callable $func, array $middlewares = []) : void {
         $this->on_error = new Route(

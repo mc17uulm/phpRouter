@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.3.4
+Version 3.3.5
 
 ### Usage
 
@@ -85,6 +85,9 @@ $router->run();
 More examples in ``index.php``
 
 ### Changelog
+
+**v3.3.5**
+* fixed invalid phpdocs caused by v3.3.4
 
 **v3.3.4**
 
