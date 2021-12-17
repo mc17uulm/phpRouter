@@ -184,7 +184,7 @@ final class Request
         if(count($this->matches) !== 1) throw new RouterException("Count of matches for path id invalid");
         $id = $this->matches[0];
         if(!is_numeric($id)) throw new RouterException("Id not numeric");
-        return $id;
+        return (int) $id;
     }
 
     /**

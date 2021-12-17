@@ -21,7 +21,7 @@ final class Route {
      */
     private $func;
     /**
-     * @var array<string>
+     * @var array<string|Middleware>
      */
     private array $middlewares;
 
@@ -30,7 +30,7 @@ final class Route {
      * @param string $type
      * @param string $query
      * @param callable $func
-     * @param array<string> $middlewares
+     * @param array<string|Middleware> $middlewares
      */
     public function __construct(string $type, string $query, callable $func, array $middlewares = [])
     {
@@ -57,13 +57,14 @@ final class Route {
     /**
      * @param Request $request
      * @param Response $response
-     * @param array<string> $middlewares
+     * @param array<string|Middleware> $middlewares
      * @throws RouterException
      */
     public function execute(Request $request, Response $response, array $middlewares = []) : void {
         $_function = $this->func;
         $_middlewares = array_map(
-            function(string $class_name) : Middleware {
+            function(string | Middleware $class_name) : Middleware {
+                if($class_name instanceof Middleware) return $class_name;
                 if(!class_exists($class_name) || !in_array(Middleware::class, class_implements($class_name))) {
                     throw new RouterException('given middleware does not implement Middleware interface');
                 }

@@ -121,4 +121,16 @@ final class DefaultRoutesTest extends TestCase
         $this->assertEquals('ok callable', $response->getBody()->getContents());
     }
 
+    /**
+     * @throws GuzzleException
+     */
+    public function dynamicMiddlewareIsWorking() : void {
+        $client = self::get_client();
+        $response_ok = $client->request('GET', 'dynamic/5');
+        $response_error = $client->request('GET', 'dynamic/12');
+        $this->assertEquals(200, $response_ok->getStatusCode());
+        $this->assertEquals('ok', $response_ok->getBody()->getContents());
+        $this->assertEquals(404, $response_error->getStatusCode());
+    }
+
 }
