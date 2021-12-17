@@ -33,7 +33,7 @@ final class Router
      */
     private ?Route $on_error = null;
     /**
-     * @var array<string>
+     * @var array<string | Middleware>
      */
     private array $middlewares = [];
     /**
@@ -198,16 +198,16 @@ final class Router
     }
 
     /**
-     * @param string $next
+     * @param string|Middleware $next
      */
-    public function requires(string $next) : void  {
+    public function requires(string | Middleware $next) : void  {
         $this->uses($next);
     }
 
     /**
-     * @param string $next
+     * @param string|Middleware $next
      */
-    public function uses(string $next) : void {
+    public function uses(string | Middleware $next) : void {
         array_push(
             $this->middlewares,
             $next

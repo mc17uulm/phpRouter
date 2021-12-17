@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.3.3
+Version 3.3.4
 
 ### Usage
 
@@ -34,6 +34,7 @@ final class TestMiddleware implements Middleware {
     }
 }
 
+
 $router = new Router();
 
 $router->uses(GlobalMiddleware::class);
@@ -47,12 +48,6 @@ $router->use_namespace([
 $router->get("/", function(Request $req, Response $res) {
     $res->show(new Index());
 });
-
-final class Test {
-    public static function handle(Request $req, Response $res) {
-        $res->show(new Index());
-    }
-}
 
 $router->get('/test', [Test::class, 'handle']);
 
@@ -87,7 +82,13 @@ $router->run();
 
 ```
 
+More examples in ``index.php``
+
 ### Changelog
+
+**v3.3.4**
+
+* enabled usage dynamic middlewares
 
 **v3.3.3**
 

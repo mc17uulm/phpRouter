@@ -27,6 +27,20 @@ final class TestMiddleware implements Middleware {
     }
 }
 
+final class DynamicMiddleware implements Middleware {
+
+    public function __construct(
+        public int $id
+    ){}
+
+    public function __invoke(Request $request, Response $response, NextFunction $next): void
+    {
+        if($request->get_match('id') === $this->id) {
+            $next();
+        }
+    }
+}
+
 $router = new Router();
 
 $router->uses(GlobalMiddleware::class);
@@ -63,6 +77,10 @@ $router->get("/params/(?P<id>\d+)/(?P<token>[a-zA-Z0-9-]+)", function(Request $r
 $router->get("/login", function(Request $req, Response $res) {
     $res->send("ok");
 }, [TestMiddleware::class]);
+
+$router->get('/dynamic/(?P<id>\d+)', function(Request $req, Response $res) {
+    $res->send('ok');
+}, [new DynamicMiddleware(5)]);
 
 $router->not_found(function(Request $req, Response $res) {
     $res->send_error("not found", "", 404);

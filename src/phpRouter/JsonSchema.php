@@ -45,7 +45,7 @@ class JsonSchema {
             throw new ValidationException("Internal Server Error", "Could not read schema file contents");
         }
 
-        $this->schema = Schema::fromJsonString(file_get_contents($file));
+        $this->schema = Schema::fromJsonString($content);
         $this->error = null;
         $this->result = null;
     }
