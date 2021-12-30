@@ -62,7 +62,7 @@ final class Request
         $this->type = $type;
         $this->params = $params;
         $this->content_type = $content_type;
-        $this->headers = $headers;
+        $this->headers = array_map(fn(string $header) => strtoupper($header), $headers);
         $this->matches = [];
         $this->body = $body;
     }
@@ -133,6 +133,17 @@ final class Request
 
     /**
      * @param string $key
+     * @return string|null
+     */
+    public function get_header(string $key) : string | null {
+        if(array_key_exists(strtoupper($key), $this->headers)) {
+            return $this->headers[strtoupper($key)];
+        }
+        return null;
+    }
+
+    /**
+     * @param string $key
      * @return mixed
      * @throws RouterException
      */
@@ -160,42 +171,6 @@ final class Request
      */
     public function get_body() : string {
         return $this->body;
-    }
-
-    /**
-     * @param bool $assoc
-     * @return array|stdClass
-     * @throws RouterException
-     */
-    public function get_json(bool $assoc = true): array|stdClass
-    {
-        try {
-            return json_decode($this->body, $assoc, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $e) {
-            throw new RouterException("JsonException: {$e->getMessage()}");
-        }
-    }
-
-    /**
-     * @return int
-     * @throws RouterException
-     */
-    public function get_path_id() : int {
-        if(count($this->matches) !== 1) throw new RouterException("Count of matches for path id invalid");
-        $id = $this->matches[0];
-        if(!is_numeric($id)) throw new RouterException("Id not numeric");
-        return (int) $id;
-    }
-
-    /**
-     * @param JsonSchema $schema
-     * @return array
-     * @throws RouterException
-     * @throws ValidationException
-     */
-    public function get_json_payload(JsonSchema $schema) : array {
-        $schema->validate($this);
-        return $this->get_json();
     }
 
 }
