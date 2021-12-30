@@ -62,7 +62,7 @@ final class Request
         $this->type = $type;
         $this->params = $params;
         $this->content_type = $content_type;
-        $this->headers = array_map(fn(string $header) => strtoupper($header), $headers);
+        $this->headers = $this->parse_headers($headers);
         $this->matches = [];
         $this->body = $body;
     }
@@ -136,8 +136,8 @@ final class Request
      * @return string|null
      */
     public function get_header(string $key) : string | null {
-        if(array_key_exists(strtoupper($key), $this->headers)) {
-            return $this->headers[strtoupper($key)];
+        if(array_key_exists(strtolower($key), $this->headers)) {
+            return $this->headers[strtolower($key)];
         }
         return null;
     }
@@ -171,6 +171,18 @@ final class Request
      */
     public function get_body() : string {
         return $this->body;
+    }
+
+    /**
+     * @param array $headers
+     * @return array
+     */
+    private function parse_headers(array $headers) : array {
+        $_headers = [];
+        foreach($headers as $key => $value) {
+            $_headers[strtolower($key)] = $value;
+        }
+        return $_headers;
     }
 
 }
