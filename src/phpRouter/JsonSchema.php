@@ -2,13 +2,14 @@
 
 namespace phpRouter;
 
+use JetBrains\PhpStorm\Pure;
 use Opis\JsonSchema\Schema;
 use Opis\JsonSchema\Validator as SchemaValidator;
 use JsonException;
 
 /**
  * Class JsonSchema
- * @package MemberDB\validator
+ * @package phpRouter
  */
 class JsonSchema {
 
@@ -78,7 +79,7 @@ class JsonSchema {
         }
     }
 
-    public function cast() : mixed {}
+    public function cast() : mixed { return null; }
 
     /**
      * @return bool
@@ -90,6 +91,7 @@ class JsonSchema {
     /**
      * @return string
      */
+    #[Pure]
     public function get_error() : string {
         if(!$this->has_error()) return "";
         return $this->error;

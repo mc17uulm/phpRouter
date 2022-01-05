@@ -36,7 +36,7 @@ final class DefaultRoutesTest extends TestCase
         $client = self::get_client();
         $response = $client->request('GET', '/error');
 
-        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals(500, $response->getStatusCode());
     }
 
     /**
@@ -131,6 +131,27 @@ final class DefaultRoutesTest extends TestCase
         $this->assertEquals(200, $response_ok->getStatusCode());
         $this->assertEquals('ok', $response_ok->getBody()->getContents());
         $this->assertEquals(404, $response_error->getStatusCode());
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function routerGroupIsWorking() : void {
+        $client = self::get_client();
+        $response = $client->request('GET', 'api/test');
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('test', $response->getBody()->getContents());
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function routerGroupNotOverwriting() : void {
+        $client = self::get_client();
+        $response = $client->request('GET', 'api');
+
+        $this->assertEquals(404, $response->getStatusCode());
     }
 
 }

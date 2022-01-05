@@ -2,9 +2,6 @@
 
 namespace phpRouter;
 
-use JsonException;
-use stdClass;
-
 /**
  * Class Request
  * @package phpRouter
@@ -12,26 +9,6 @@ use stdClass;
 final class Request
 {
 
-    /**
-     * @var string
-     */
-    private string $ip;
-    /**
-     * @var string
-     */
-    private string $url;
-    /**
-     * @var string
-     */
-    private string $type;
-    /**
-     * @var array
-     */
-    private array $params;
-    /**
-     * @var string
-     */
-    private string $content_type;
     /**
      * @var array
      */
@@ -49,19 +26,24 @@ final class Request
      * Request constructor.
      * @param string $ip
      * @param string $url
+     * @param string $path
      * @param string $type
      * @param array $params
      * @param string $content_type
      * @param array $headers
      * @param string $body
      */
-    public function __construct(string $ip, string $url, string $type, array $params, string $content_type, array $headers, string $body)
+    public function __construct(
+        private string $ip,
+        private string $url,
+        private string $path,
+        private string $type,
+        private array $params,
+        private string $content_type,
+        array $headers,
+        string $body
+    )
     {
-        $this->ip = $ip;
-        $this->url = $url;
-        $this->type = $type;
-        $this->params = $params;
-        $this->content_type = $content_type;
         $this->headers = $this->parse_headers($headers);
         $this->matches = [];
         $this->body = $body;
@@ -79,6 +61,13 @@ final class Request
      */
     public function get_url() : string {
         return $this->url;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_path() : string {
+        return $this->path;
     }
 
     /**

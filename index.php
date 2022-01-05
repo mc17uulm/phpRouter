@@ -74,6 +74,12 @@ $router->get("/params/(?P<id>\d+)/(?P<token>[a-zA-Z0-9-]+)", function(Request $r
     $res->send("$token: $id");
 });
 
+$router->group('/api', function(Router $router) {
+    $router->get('/test', function(Request $req, Response $res) {
+        $res->send('test');
+    });
+});
+
 $router->get("/login", function(Request $req, Response $res) {
     $res->send("ok");
 }, [TestMiddleware::class]);
@@ -87,13 +93,8 @@ $router->not_found(function(Request $req, Response $res) {
 });
 
 $router->on_error(function(Request $req, Response $res, string $error) {
-    if($req->get_content_type() !== "application/json") {
-        $res->render(new View(function() use ($error) {
-            ?>
-            <h1>Error</h1>
-            <p><?= $error ?></p>
-            <?php
-        }), 400);
+    if(!$req->has_content_type('application/json')) {
+        $res->send("<h1>Error</h1><p><?= $error ?></p>", 500);
     }
 });
 

@@ -8,22 +8,11 @@ namespace phpRouter;
  */
 final class Route {
 
-    /**
-     * @var string
-     */
-    private string $type;
-    /**
-     * @var string
-     */
     private string $query;
     /**
      * @var callable
      */
     private $func;
-    /**
-     * @var array<string|Middleware>
-     */
-    private array $middlewares;
 
     /**
      * Route constructor.
@@ -31,13 +20,17 @@ final class Route {
      * @param string $query
      * @param callable $func
      * @param array<string|Middleware> $middlewares
+     * @param string|null $namespace
      */
-    public function __construct(string $type, string $query, callable $func, array $middlewares = [])
-    {
-        $this->type = $type;
-        $this->query = $query;
+    public function __construct(
+        private string $type,
+        string $query,
+        callable $func,
+        private array $middlewares = [],
+        ?string $namespace = null
+    ) {
+        $this->query = $namespace === null ? $query : "$namespace$query";
         $this->func = $func;
-        $this->middlewares = $middlewares;
     }
 
     /**
@@ -65,7 +58,9 @@ final class Route {
         $_middlewares = array_map(
             function(string | Middleware $class_name) : Middleware {
                 if($class_name instanceof Middleware) return $class_name;
-                if(!class_exists($class_name) || !in_array(Middleware::class, class_implements($class_name))) {
+                $implemented = class_implements($class_name);
+                if(!$implemented) throw new RouterException('given middleware does not implement Middleware interface');
+                if(!class_exists($class_name) || !in_array(Middleware::class, $implemented)) {
                     throw new RouterException('given middleware does not implement Middleware interface');
                 }
                 return new $class_name();
