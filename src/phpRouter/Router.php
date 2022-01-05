@@ -3,6 +3,7 @@
 namespace phpRouter;
 
 use Jenssegers\Blade\Blade;
+use JetBrains\PhpStorm\NoReturn;
 use Throwable;
 
 /**
@@ -44,6 +45,10 @@ final class Router
      * @var Blade|null
      */
     private ?Blade $blade = null;
+    /**
+     * @var string|null
+     */
+    private ?string $namespace = null;
 
     /**
      * Router constructor.
@@ -55,16 +60,23 @@ final class Router
         $this->routes = [];
 
         $url = parse_url($_SERVER["REQUEST_URI"]);
-        $this->path = $url["path"];
+        if(!$url) throw new RouterException('Cannot parse URL');
+        $this->path = $url["path"] ?? '';
+
+        $body = file_get_contents("php://input");
+        if(!$body) {
+            $body = '';
+        }
 
         $this->request = new Request(
             $this->load_ip(),
+            $_SERVER["REQUEST_URI"],
             $this->path,
             $_SERVER["REQUEST_METHOD"],
             $this->load_parameters(),
             $_SERVER["CONTENT_TYPE"] ?? "text/plain",
             apache_request_headers(),
-            file_get_contents("php://input")
+            $body
         );
 
         $this->debug = $debug;
@@ -99,7 +111,9 @@ final class Router
             throw new RouterException("No ip address given");
         }
 
-        return filter_var($ip, FILTER_VALIDATE_IP);
+        $ip = filter_var($ip, FILTER_VALIDATE_IP);
+        if(!$ip) throw new RouterException("No ip address given");
+        return $ip;
     }
 
     /**
@@ -108,6 +122,12 @@ final class Router
      */
     public function set_engine(string $dir, string $cache) : void {
         $this->blade = new Blade($dir, $cache);
+    }
+
+    public function group(string $namespace, callable $run) : void {
+        $this->namespace = $namespace;
+        $run($this);
+        $this->namespace = null;
     }
 
     /**
@@ -122,7 +142,8 @@ final class Router
                 "GET",
                 $query,
                 $func,
-                $middlewares
+                $middlewares,
+                $this->namespace
             )
         );
     }
@@ -139,7 +160,8 @@ final class Router
                 "POST",
                 $query,
                 $func,
-                $middlewares
+                $middlewares,
+                $this->namespace
             )
         );
     }
@@ -156,7 +178,8 @@ final class Router
                 "PUT",
                 $query,
                 $func,
-                $middlewares
+                $middlewares,
+                $this->namespace
             )
         );
     }
@@ -173,7 +196,8 @@ final class Router
                 "DELETE",
                 $query,
                 $func,
-                $middlewares
+                $middlewares,
+                $this->namespace
             )
         );
     }
@@ -199,6 +223,7 @@ final class Router
 
     /**
      * @param string|Middleware $next
+     * @alias uses(string | Middleware $next) : void
      */
     public function requires(string | Middleware $next) : void  {
         $this->uses($next);
@@ -219,23 +244,20 @@ final class Router
      * @param Response $res
      * @param string $dir
      */
+    #[NoReturn]
     private static function handle_dir_request(Request $req, Response $res, string $dir) : void {
         $path = $req->get_matches()[0];
         $base = realpath($dir);
         $filepath = realpath("$dir$path");
         if(!str_starts_with($filepath, $base)) {
-            $res->set_http_code(404);
-            $res->send("Invalid path");
+            $res->send("Invalid path", 404);
         }
         if(!is_file($filepath)) {
-            $res->set_http_code(404);
-            $res->send("File not found");
+            $res->send("File not found", 404);
         }
         if(!is_readable($filepath)) {
-            $res->set_http_code(404);
-            $res->send("File not readable");
+            $res->send("File not readable", 404);
         }
-        $res->set_http_code(200);
 
         $res->set_content_type(self::get_mime_type($filepath));
         $res->send(file_get_contents($filepath));
@@ -311,7 +333,6 @@ final class Router
             }
 
             if(!$route_found) {
-                $response->set_http_code(404);
                 $this->not_found->execute($this->request, $response, $this->middlewares);
             }
         } catch (SendableException $e) {

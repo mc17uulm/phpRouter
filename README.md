@@ -1,6 +1,6 @@
 # phpRouter
 
-Version 3.3.5
+Version 3.4.0
 
 ### Usage
 
@@ -85,6 +85,18 @@ $router->run();
 More examples in ``index.php``
 
 ### Changelog
+
+**v3.4.0**
+* added ``group()`` to ``Router`` for namespacing
+* removed own rendering library ``View``
+* added generic ``Validator`` for json schemas on ``Request``
+* ``get_path()`` on  ``Request`` returns now path (former function of ``get_url()``); ``get_url()`` now returns full url
+* all ``never`` functions on ``Response`` can now be added with a http code. Removed ``code`` property from class
+* added alias ``view()`` for ``blade()`` to ``Response``
+* fixed some bugs
+
+**v3.3.6**
+* updated header handling
 
 **v3.3.5**
 * fixed invalid phpdocs caused by v3.3.4

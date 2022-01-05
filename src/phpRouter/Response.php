@@ -3,6 +3,7 @@
 namespace phpRouter;
 
 use Jenssegers\Blade\Blade;
+use JetBrains\PhpStorm\NoReturn;
 
 /**
  * Class Response
@@ -15,10 +16,6 @@ final class Response
      * @var array<string, string>
      */
     private array $headers;
-    /**
-     * @var int
-     */
-    private int $code;
     /**
      * @var string
      */
@@ -40,7 +37,6 @@ final class Response
     public function __construct(bool $debug = false, ?Blade $blade = null)
     {
         $this->headers = [];
-        $this->code = 200;
         $this->content_type = "text/html";
         $this->debug = $debug;
         $this->blade = $blade;
@@ -52,13 +48,6 @@ final class Response
      */
     public function add_header(string $key, string $value) : void {
         $this->headers += array($key => $value);
-    }
-
-    /**
-     * @param int $code
-     */
-    public function set_http_code(int $code) : void {
-        $this->code = $code;
     }
 
     /**
@@ -75,18 +64,13 @@ final class Response
     }
 
     /**
-     * @param View $view
-     */
-    public function show(View $view) : void {
-        $this->render($view);
-    }
-
-    /**
      * @param mixed $data
+     * @param int $code
      */
-    public function send(mixed $data = "") : void
+    #[NoReturn]
+    public function send(mixed $data = "", int $code = 200) : void
     {
-        http_response_code($this->code);
+        http_response_code($code);
         if($this->debug) {
             $this->add_header('Access-Control-Allow-Origin', '*');
             $this->add_header('Access-Control-Allow-Methods', 'POST');
@@ -100,10 +84,12 @@ final class Response
 
     /**
      * @param mixed $data
+     * @param int $code
      */
-    public function send_success(mixed $data = "") : void {
+    #[NoReturn]
+    public function send_success(mixed $data = "", int $code = 200) : void {
         $this->set_content_type("application/json");
-        $this->send(json_encode($data));
+        $this->send(json_encode($data), $code);
     }
 
     /**
@@ -111,9 +97,9 @@ final class Response
      * @param string $debug_message
      * @param int $code
      */
+    #[NoReturn]
     public function send_error(string $message, string $debug_message = "", int $code = 400) : void
     {
-        $this->set_http_code($code);
         $this->set_content_type("application/json");
         $response = [
             "status" => "error",
@@ -122,30 +108,16 @@ final class Response
         if($this->debug) {
             $response["debug"] = $debug_message;
         }
-        $this->send(json_encode($response));
+        $this->send(json_encode($response), $code);
     }
 
     /**
      * @param SendableException $e
-     */
-    public function send_exception(SendableException $e) : void {
-        $this->send_error($e->get_public_message(), $e->getMessage());
-    }
-
-    /**
-     * @param View $view
      * @param int $code
      */
-    public function render(View $view, int $code = 200) : void {
-        if($this->debug) {
-            header("Access-Control-Allow-Origin: *");
-            header("Access-Control-Allow-Methods: POST");
-        }
-        http_response_code($code);
-        $this->set_content_type('text/html');
-        $this->send_headers();
-        $view->show();
-        die();
+    #[NoReturn]
+    public function send_exception(SendableException $e, int $code = 500) : void {
+        $this->send_error($e->get_public_message(), $e->getMessage(), $code);
     }
 
     /**
@@ -160,6 +132,17 @@ final class Response
      * @param array $content
      * @param int $code
      */
+    #[NoReturn]
+    public function view(string $name, array $content, int $code = 200) : void {
+        $this->blade($name, $content, $code);
+    }
+
+    /**
+     * @param string $name
+     * @param array $content
+     * @param int $code
+     */
+    #[NoReturn]
     public function blade(string $name, array $content, int $code = 200) : void {
         http_response_code($code);
         if($this->debug) {
@@ -175,6 +158,7 @@ final class Response
     /**
      * @param string $url
      */
+    #[NoReturn]
     public function redirect(string $url) : void {
         header("Location: $url");
         die();
